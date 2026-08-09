@@ -220,7 +220,7 @@ def build_cycle_model(history: list[str], period_duration_days: int, today: date
         days_until = (next_date - now).days
 
     state = STATE_NEUTRAL
-    if now.isoformat() in set(normalized):
+    if now.isoformat() in set(base_history):
         state = STATE_PERIOD
     elif fertile_start and fertile_end and fertile_start <= now.isoformat() <= fertile_end:
         state = STATE_FERTILE

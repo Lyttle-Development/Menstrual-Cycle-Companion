@@ -22,6 +22,13 @@ class CycleModel:
     days_until_next_start: int | None
     period_duration_days: int
     learned_period_duration_days: int | None
+    menstruation_start: str | None
+    menstruation_end: str | None
+    follicular_phase_start: str | None
+    follicular_phase_end: str | None
+    ovulation_date: str | None
+    luteal_phase_start: str | None
+    luteal_phase_end: str | None
     state: str
 
 
@@ -138,6 +145,31 @@ def build_cycle_model(history: list[str], period_duration_days: int, today: date
     next_start, avg_cycle = predict_next_start(starts)
     effective_duration, learned_avg_duration = learned_period_duration(period_duration_days, blocks)
 
+    menstruation_start = starts[-1] if starts else None
+    menstruation_end: str | None = None
+    follicular_start: str | None = None
+    follicular_end: str | None = None
+    ovulation_date: str | None = None
+    luteal_start: str | None = None
+    luteal_end: str | None = None
+    if menstruation_start and next_start:
+        cycle_start = date.fromisoformat(menstruation_start)
+        cycle_end = date.fromisoformat(next_start) - timedelta(days=1)
+        menstruation_end_date = min(cycle_start + timedelta(days=effective_duration - 1), cycle_end)
+        menstruation_end = menstruation_end_date.isoformat()
+        follicular_start_date = menstruation_end_date + timedelta(days=1)
+        ovulation_candidate = date.fromisoformat(next_start) - timedelta(days=14)
+        ovulation_date_value = (
+            cycle_end
+            if follicular_start_date > cycle_end
+            else max(follicular_start_date, min(ovulation_candidate, cycle_end))
+        )
+        ovulation_date = ovulation_date_value.isoformat()
+        follicular_start = follicular_start_date.isoformat()
+        follicular_end = (ovulation_date_value - timedelta(days=1)).isoformat()
+        luteal_start = min(ovulation_date_value + timedelta(days=1), cycle_end).isoformat()
+        luteal_end = cycle_end.isoformat()
+
     fertile_start: str | None = None
     fertile_end: str | None = None
     days_until: int | None = None
@@ -168,5 +200,12 @@ def build_cycle_model(history: list[str], period_duration_days: int, today: date
         days_until_next_start=days_until,
         period_duration_days=effective_duration,
         learned_period_duration_days=learned_avg_duration,
+        menstruation_start=menstruation_start,
+        menstruation_end=menstruation_end,
+        follicular_phase_start=follicular_start,
+        follicular_phase_end=follicular_end,
+        ovulation_date=ovulation_date,
+        luteal_phase_start=luteal_start,
+        luteal_phase_end=luteal_end,
         state=state,
     )

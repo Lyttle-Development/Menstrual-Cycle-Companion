@@ -7,6 +7,7 @@ A privacy-first Home Assistant custom integration for recording menstrual bleedi
 ## What it provides
 
 - One configurable profile and sensor per person.
+- Additional date sensors for next menstruation, follicular phase, ovulation, and luteal phase.
 - Persistent local history in Home Assistant's `.storage` directory.
 - Cycle state: `period`, `fertile`, `pms`, or `neutral`.
 - Predicted next start, average cycle length, fertile-window dates, and days until the prediction.
@@ -80,6 +81,10 @@ The sensor state is one of `period`, `fertile`, `pms`, or `neutral`. Useful attr
 - `period_duration_days`
 - `period_duration_default_days`
 - `period_duration_learned_avg_days`
+- `menstruation_start` and `menstruation_end`
+- `follicular_phase_start` and `follicular_phase_end`
+- `ovulation_date`
+- `luteal_phase_start` and `luteal_phase_end`
 
 Predictions are intentionally simple estimates from recent confirmed starts. Record enough history to make the estimates useful, and treat them as approximate.
 
@@ -129,6 +134,10 @@ Cards are intentionally distributed separately so the integration remains a stan
 - `custom:menstrual-cycle-heatmap-card`
 
 The cards require this integration and a configured sensor.
+
+The gauge's outer ring uses these calculated boundaries to show the proposed
+menstruation, follicular, ovulation, and luteal phases. They are estimates based
+on the predicted next start and should not be treated as medical guidance.
 
 The gauge card's calendar editor uses range selection by default: click the
 first bleeding day, then click the last bleeding day. The selected interval is

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import date, timedelta
+from statistics import median
 
 from .const import STATE_FERTILE, STATE_NEUTRAL, STATE_PERIOD, STATE_PMS
 
@@ -17,6 +18,10 @@ class CycleModel:
     bleeding_blocks: list[dict[str, str | int]]
     next_predicted_start: str | None
     avg_cycle_length: int | None
+    cycle_length_samples: list[int]
+    cycle_length_variability: int | None
+    prediction_confidence: str
+    prediction_method: str
     fertile_window_start: str | None
     fertile_window_end: str | None
     days_until_next_start: int | None
@@ -85,9 +90,9 @@ def bleeding_blocks(days: list[str]) -> list[list[str]]:
 
 
 def learned_period_duration(default_days: int, blocks: list[list[str]]) -> tuple[int, int | None]:
-    """Learn period duration from historical block lengths; only adapt upward."""
+    """Learn period duration from recent historical block lengths."""
     default_norm = max(1, min(14, int(default_days)))
-    if len(blocks) < 3:
+    if len(blocks) < 2:
         return default_norm, None
 
     recent = blocks[-6:]
@@ -95,32 +100,58 @@ def learned_period_duration(default_days: int, blocks: list[list[str]]) -> tuple
     if not lengths:
         return default_norm, None
 
-    avg_len = round(sum(lengths) / len(lengths))
-    learned = max(default_norm, max(1, min(14, avg_len)))
-    return learned, avg_len
+    learned = round(median(lengths))
+    return max(1, min(14, learned)), round(sum(lengths) / len(lengths))
 
 
-def predict_next_start(grouped_starts: list[str]) -> tuple[str | None, int | None]:
-    """Predict next cycle start based on recent cycle lengths."""
-    if not grouped_starts:
-        return None, None
-
-    if len(grouped_starts) == 1:
-        last = date.fromisoformat(grouped_starts[0])
-        return (last + timedelta(days=28)).isoformat(), 28
-
+def _valid_cycle_lengths(grouped_starts: list[str]) -> list[int]:
+    """Return physiologically plausible intervals between recorded starts."""
     lengths: list[int] = []
-    start_index = max(1, len(grouped_starts) - 4)
-    for idx in range(start_index, len(grouped_starts)):
-        current = date.fromisoformat(grouped_starts[idx])
-        prev = date.fromisoformat(grouped_starts[idx - 1])
-        diff = (current - prev).days
+    for idx in range(1, len(grouped_starts)):
+        diff = (
+            date.fromisoformat(grouped_starts[idx])
+            - date.fromisoformat(grouped_starts[idx - 1])
+        ).days
         if 10 < diff < 80:
             lengths.append(diff)
+    return lengths
 
-    avg = round(sum(lengths) / len(lengths)) if lengths else 28
-    next_start = date.fromisoformat(grouped_starts[-1]) + timedelta(days=avg)
-    return next_start.isoformat(), avg
+
+def _robust_cycle_lengths(lengths: list[int]) -> list[int]:
+    """Remove isolated recording errors without discarding normal variation."""
+    if len(lengths) < 4:
+        return lengths
+    center = median(lengths)
+    deviations = [abs(value - center) for value in lengths]
+    mad = median(deviations)
+    tolerance = max(6, 2.5 * mad)
+    filtered = [value for value in lengths if abs(value - center) <= tolerance]
+    return filtered or lengths
+
+
+def predict_next_start(
+    grouped_starts: list[str],
+) -> tuple[str | None, int | None, list[int], int | None, str, str]:
+    """Predict the next start from a robust, recent, person-specific baseline."""
+    if not grouped_starts:
+        return None, None, [], None, "none", "no_history"
+
+    raw_lengths = _valid_cycle_lengths(grouped_starts)
+    if not raw_lengths:
+        last = date.fromisoformat(grouped_starts[0])
+        return (last + timedelta(days=28)).isoformat(), 28, [], None, "default", "low"
+
+    lengths = _robust_cycle_lengths(raw_lengths[-8:])
+    # Weight recent cycles more heavily while retaining the person's established baseline.
+    weights = list(range(1, len(lengths) + 1))
+    predicted_length = round(sum(value * weight for value, weight in zip(lengths, weights)) / sum(weights))
+    variability = round(median([abs(value - median(lengths)) for value in lengths])) if len(lengths) > 1 else 0
+    confidence = "medium" if len(lengths) < 4 else "high"
+    if variability >= 7:
+        confidence = "variable"
+
+    next_start = date.fromisoformat(grouped_starts[-1]) + timedelta(days=predicted_length)
+    return next_start.isoformat(), predicted_length, lengths, variability, "weighted_recent", confidence
 
 
 def build_cycle_model(history: list[str], period_duration_days: int, today: date | None = None) -> CycleModel:
@@ -142,7 +173,14 @@ def build_cycle_model(history: list[str], period_duration_days: int, today: date
         if block
     ]
     starts = grouped_cycle_starts(base_history)
-    next_start, avg_cycle = predict_next_start(starts)
+    (
+        next_start,
+        avg_cycle,
+        cycle_length_samples,
+        cycle_length_variability,
+        prediction_method,
+        prediction_confidence,
+    ) = predict_next_start(starts)
     effective_duration, learned_avg_duration = learned_period_duration(period_duration_days, blocks)
 
     menstruation_start = starts[-1] if starts else None
@@ -195,6 +233,10 @@ def build_cycle_model(history: list[str], period_duration_days: int, today: date
         bleeding_blocks=blocks_payload,
         next_predicted_start=next_start,
         avg_cycle_length=avg_cycle,
+        cycle_length_samples=cycle_length_samples,
+        cycle_length_variability=cycle_length_variability,
+        prediction_confidence=prediction_confidence,
+        prediction_method=prediction_method,
         fertile_window_start=fertile_start,
         fertile_window_end=fertile_end,
         days_until_next_start=days_until,

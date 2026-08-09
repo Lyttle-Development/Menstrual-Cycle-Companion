@@ -76,6 +76,9 @@ The sensor state is one of `period`, `fertile`, `pms`, or `neutral`. Useful attr
 - `bleeding_blocks`
 - `next_predicted_start`
 - `avg_cycle_length`
+- `cycle_length_samples`
+- `cycle_length_variability_days`
+- `prediction_confidence` and `prediction_method`
 - `fertile_window_start` and `fertile_window_end`
 - `days_until_next_start`
 - `period_duration_days`
@@ -86,7 +89,14 @@ The sensor state is one of `period`, `fertile`, `pms`, or `neutral`. Useful attr
 - `ovulation_date`
 - `luteal_phase_start` and `luteal_phase_end`
 
-Predictions are intentionally simple estimates from recent confirmed starts. Record enough history to make the estimates useful, and treat them as approximate.
+Predictions are personalized from the person's confirmed start history. The
+model uses up to the eight most recent valid cycle intervals, gives newer
+cycles more weight, and filters isolated recording outliers. Period duration is
+learned from recent bleeding blocks once at least two blocks are available.
+With no interval history, the model uses a clearly marked 28-day fallback;
+this is replaced automatically as more entries are recorded. The prediction
+metadata attributes expose the sample count, typical variation, method, and
+confidence. All phase dates remain estimates, not medical guidance.
 
 ## Services
 

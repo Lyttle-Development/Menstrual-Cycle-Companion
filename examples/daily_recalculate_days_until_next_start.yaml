@@ -1,0 +1,12 @@
+alias: Menstrual Cycle Companion - Daily Recalculate days_until_next_start
+description: >
+  Triggers once per day and refreshes all menstrual cycle companion sensors,
+  so date-based attributes such as days_until_next_start are recalculated.
+mode: single
+trigger:
+  - platform: time
+    at: "00:00:05"
+condition: []
+action:
+  - service: menstrual_cycle_companion.refresh_cycle_model
+    data: {}

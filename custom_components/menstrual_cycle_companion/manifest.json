@@ -1,0 +1,8 @@
+{
+  "domain": "menstrual_cycle_companion",
+  "name": "Menstrual Cycle Companion",
+  "codeowners": ["@Lyttle-Development"],
+  "config_flow": true,
+  "documentation": "https://www.home-assistant.io/integrations/menstrual_cycle_companion",
+  "iot_class": "local_push"
+}

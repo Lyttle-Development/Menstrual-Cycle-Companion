@@ -75,6 +75,7 @@ The sensor state is one of `period`, `fertile`, `pms`, or `neutral`. Useful attr
 - `grouped_starts`
 - `bleeding_blocks`
 - `next_predicted_start`
+- `predicted_cycle_starts` — the next 12 predicted cycle starts
 - `avg_cycle_length`
 - `cycle_length_samples`
 - `cycle_length_variability_days`
@@ -93,6 +94,8 @@ Predictions are personalized from the person's confirmed start history. The
 model uses up to the eight most recent valid cycle intervals, gives newer
 cycles more weight, and filters isolated recording outliers. Period duration is
 learned from recent bleeding blocks once at least two blocks are available.
+The `predicted_cycle_starts` attribute projects the current predicted cycle
+length forward for 12 future starts and is recalculated when history changes.
 With no interval history, the model uses a clearly marked 28-day fallback;
 this is replaced automatically as more entries are recorded. The prediction
 metadata attributes expose the sample count, typical variation, method, and

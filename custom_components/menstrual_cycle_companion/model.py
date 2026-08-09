@@ -17,6 +17,7 @@ class CycleModel:
     grouped_starts: list[str]
     bleeding_blocks: list[dict[str, str | int]]
     next_predicted_start: str | None
+    predicted_cycle_starts: list[str]
     avg_cycle_length: int | None
     cycle_length_samples: list[int]
     cycle_length_variability: int | None
@@ -154,6 +155,22 @@ def predict_next_start(
     return next_start.isoformat(), predicted_length, lengths, variability, "weighted_recent", confidence
 
 
+def predict_future_starts(
+    next_start: str | None,
+    cycle_length: int | None,
+    count: int = 12,
+) -> list[str]:
+    """Return successive predicted cycle starts after the latest recorded cycle."""
+    if not next_start or not cycle_length or count <= 0:
+        return []
+
+    first_start = date.fromisoformat(next_start)
+    return [
+        (first_start + timedelta(days=cycle_length * offset)).isoformat()
+        for offset in range(count)
+    ]
+
+
 def build_cycle_model(history: list[str], period_duration_days: int, today: date | None = None) -> CycleModel:
     """Build complete cycle model for sensor state + attributes."""
     now = today or date.today()
@@ -181,6 +198,7 @@ def build_cycle_model(history: list[str], period_duration_days: int, today: date
         prediction_method,
         prediction_confidence,
     ) = predict_next_start(starts)
+    predicted_cycle_starts = predict_future_starts(next_start, avg_cycle)
     effective_duration, learned_avg_duration = learned_period_duration(period_duration_days, blocks)
 
     menstruation_start = starts[-1] if starts else None
@@ -232,6 +250,7 @@ def build_cycle_model(history: list[str], period_duration_days: int, today: date
         grouped_starts=starts,
         bleeding_blocks=blocks_payload,
         next_predicted_start=next_start,
+        predicted_cycle_starts=predicted_cycle_starts,
         avg_cycle_length=avg_cycle,
         cycle_length_samples=cycle_length_samples,
         cycle_length_variability=cycle_length_variability,

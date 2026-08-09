@@ -30,6 +30,7 @@ from .const import (
     ATTR_NEXT_PREDICTED_START,
     ATTR_OVULATION_DATE,
     ATTR_PERIOD_DURATION_DAYS,
+    ATTR_PREDICTED_CYCLE_STARTS,
     DOMAIN,
     SIGNAL_HISTORY_UPDATED,
 )
@@ -104,6 +105,7 @@ class MenstrualCycleGaugeSensor(SensorEntity):
             ATTR_GROUPED_STARTS: model.grouped_starts,
             ATTR_BLEEDING_BLOCKS: model.bleeding_blocks,
             ATTR_NEXT_PREDICTED_START: model.next_predicted_start,
+            ATTR_PREDICTED_CYCLE_STARTS: model.predicted_cycle_starts,
             ATTR_AVG_CYCLE_LENGTH: model.avg_cycle_length,
             "cycle_length_samples": model.cycle_length_samples,
             "cycle_length_variability_days": model.cycle_length_variability,

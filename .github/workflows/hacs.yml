@@ -16,3 +16,5 @@ jobs:
         uses: hacs/action@main
         with:
           category: integration
+          # Description and topics are repository settings, not tracked files.
+          ignore: topics,description

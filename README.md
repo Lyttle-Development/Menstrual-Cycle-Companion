@@ -2,7 +2,7 @@
 
 A privacy-first Home Assistant custom integration for recording menstrual bleeding days, estimating cycle phases, and exposing the results as sensors.
 
-ly> This project is for personal tracking and pattern recognition. It is not a medical device, diagnostic tool, contraceptive method, or fertility-planning method. Read [`DISCLAIMER.md`](DISCLAIMER.md) before use.
+> This project is for personal tracking and pattern recognition. It is not a medical device, diagnostic tool, contraceptive method, or fertility-planning method. Read [`DISCLAIMER.md`](DISCLAIMER.md) before use.
 
 ## What it provides
 
@@ -125,6 +125,8 @@ Cycle history is sensitive health information. Keep Home Assistant access restri
 ## Development
 
 The repository includes HACS and Hassfest workflows. Python tests and Home Assistant test fixtures should be added before publishing a stable release. Validate JSON and YAML files and run JavaScript syntax checks in CI.
+
+Before publishing to HACS, set a non-empty description and valid topics in the GitHub repository's **About** settings (at minimum `home-assistant` and `hacs`). The CI workflow currently skips only those two API-managed checks because repository settings cannot be stored in this repository.
 
 ## License
 

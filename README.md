@@ -6,8 +6,9 @@ A privacy-first Home Assistant custom integration for recording menstrual bleedi
 
 ## What it provides
 
-- One configurable profile and sensor per person.
-- Additional date sensors for next menstruation, follicular phase, ovulation, and luteal phase.
+- One configurable profile and one `Menstrual Cycle` device per person.
+- A master sensor on that device retains the complete cycle model as attributes.
+- Every master-sensor attribute is also exposed as an entity on the same device.
 - Persistent local history in Home Assistant's `.storage` directory.
 - Cycle state: `period`, `fertile`, `pms`, or `neutral`.
 - Predicted next start, average cycle length, fertile-window dates, and days until the prediction.
@@ -32,7 +33,7 @@ Copy `custom_components/menstrual_cycle_companion` into `/config/custom_componen
 
 ## First setup
 
-Create a profile with a stable profile name such as `anna` and a friendly name such as `Anna`. The resulting sensor is usually similar to `sensor.anna` but the final entity ID is controlled by Home Assistant's entity registry.
+Create a profile with a stable profile name such as `anna` and a friendly name such as `Anna`. Home Assistant creates one device using that friendly name. The device contains a master sensor plus entities such as `Next Predicted Start`, `Avg Cycle Length`, and `History`; final entity IDs are controlled by Home Assistant's entity registry. The master sensor is the recommended entity for service calls and retains the complete attribute payload for existing cards.
 
 Add confirmed bleeding days from a card or with a service:
 
@@ -67,9 +68,9 @@ data:
   end_date: "2026-08-05"
 ```
 
-## Sensor attributes
+## Master sensor attributes and entities
 
-The sensor state is one of `period`, `fertile`, `pms`, or `neutral`. Useful attributes include:
+The master sensor state is one of `period`, `fertile`, `pms`, or `neutral`. Every attribute below remains available on the master sensor and is also represented by a child entity on the same device:
 
 - `history`
 - `grouped_starts`
@@ -89,6 +90,13 @@ The sensor state is one of `period`, `fertile`, `pms`, or `neutral`. Useful attr
 - `follicular_phase_start` and `follicular_phase_end`
 - `ovulation_date`
 - `luteal_phase_start` and `luteal_phase_end`
+
+Date attributes are date sensors. Numeric and text attributes expose their value
+directly. Collection attributes (`history`, `grouped_starts`, `bleeding_blocks`,
+`predicted_cycle_starts`, and `cycle_length_samples`) expose their item count as
+the entity state and retain the complete collection in the entity's `value`
+attribute. This is necessary because Home Assistant entity states cannot be
+lists or dictionaries.
 
 Predictions are personalized from the person's confirmed start history. The
 model uses up to the eight most recent valid cycle intervals, gives newer

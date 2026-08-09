@@ -11,6 +11,7 @@ A privacy-first Home Assistant custom integration for recording menstrual bleedi
 - Cycle state: `period`, `fertile`, `pms`, or `neutral`.
 - Predicted next start, average cycle length, fertile-window dates, and days until the prediction.
 - Services for adding, removing, importing, exporting, and clearing history.
+- Inclusive cycle start/end date selection from the companion gauge card.
 - A separate companion card repository: [`menstrual-cycle-companion-cards`](https://github.com/Lyttle-Development/menstrual-cycle-companion-cards).
 
 ## Install with HACS
@@ -55,6 +56,16 @@ data:
     - "2026-07-01"
 ```
 
+Set a complete cycle range in one operation (both dates are included):
+
+```yaml
+action: menstrual_cycle_companion.set_cycle_range
+data:
+  entity_id: sensor.anna
+  start_date: "2026-08-01"
+  end_date: "2026-08-05"
+```
+
 ## Sensor attributes
 
 The sensor state is one of `period`, `fertile`, `pms`, or `neutral`. Useful attributes include:
@@ -78,6 +89,7 @@ All services accept `entity_id`, `profile`, or `entry_id` when more than one pro
 
 - `menstrual_cycle_companion.add_cycle_start`
 - `menstrual_cycle_companion.remove_cycle_start`
+- `menstrual_cycle_companion.set_cycle_range`
 - `menstrual_cycle_companion.set_cycle_history`
 - `menstrual_cycle_companion.set_period_duration`
 - `menstrual_cycle_companion.refresh_cycle_model`
@@ -117,6 +129,12 @@ Cards are intentionally distributed separately so the integration remains a stan
 - `custom:menstrual-cycle-heatmap-card`
 
 The cards require this integration and a configured sensor.
+
+The gauge card's calendar editor uses range selection by default: click the
+first bleeding day, then click the last bleeding day. The selected interval is
+shown immediately, and the completed range is written as confirmed bleeding
+days. Set `calendar_selection_mode: toggle` in the card configuration to retain
+single-day add/remove behavior.
 
 ## Privacy and responsible use
 

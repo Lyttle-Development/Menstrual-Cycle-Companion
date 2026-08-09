@@ -50,6 +50,39 @@ remove_cycle_start:
       selector:
         text:
 
+set_cycle_range:
+  name: Set cycle start and end dates
+  description: Add every confirmed bleeding day from the start date through the end date, inclusive.
+  fields:
+    entity_id:
+      required: false
+      example: "sensor.anna_zyklus"
+      selector:
+        entity:
+          domain: sensor
+    profile:
+      required: false
+      example: "anna"
+      selector:
+        text:
+    entry_id:
+      required: false
+      example: "a1b2c3d4e5f6..."
+      selector:
+        text:
+    start_date:
+      name: Start date
+      required: true
+      example: "2026-03-01"
+      selector:
+        date:
+    end_date:
+      name: End date
+      required: true
+      example: "2026-03-05"
+      selector:
+        date:
+
 set_cycle_history:
   name: Replace full cycle history
   description: Replace complete confirmed bleeding history with a list of dates.

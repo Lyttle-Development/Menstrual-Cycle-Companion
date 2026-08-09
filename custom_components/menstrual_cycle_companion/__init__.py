@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from pathlib import Path
 
 import voluptuous as vol
@@ -34,6 +34,7 @@ from .const import (
     SERVICE_EXPORT_HISTORY,
     SERVICE_REFRESH_CYCLE_MODEL,
     SERVICE_FIELD_DATE,
+    SERVICE_FIELD_END_DATE,
     SERVICE_FIELD_DATES,
     SERVICE_FIELD_DAYS,
     SERVICE_FIELD_ENTITY_ID,
@@ -42,7 +43,9 @@ from .const import (
     SERVICE_FIELD_FILENAME,
     SERVICE_FIELD_FORMAT,
     SERVICE_FIELD_PROFILE,
+    SERVICE_FIELD_START_DATE,
     SERVICE_REMOVE_CYCLE_START,
+    SERVICE_SET_CYCLE_RANGE,
     SERVICE_SET_CYCLE_HISTORY,
     SERVICE_SET_PERIOD_DURATION,
     SIGNAL_HISTORY_UPDATED,
@@ -233,6 +236,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     async def async_remove(call: ServiceCall) -> None:
         await _async_handle_remove(hass, call)
 
+    async def async_set_range(call: ServiceCall) -> None:
+        await _async_handle_set_range(hass, call)
+
     async def async_set_history(call: ServiceCall) -> None:
         await _async_handle_set_history(hass, call)
 
@@ -268,6 +274,20 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             SERVICE_REMOVE_CYCLE_START,
             async_remove,
             schema=vol.Schema({**common_profile_field, vol.Required(SERVICE_FIELD_DATE): cv.string}),
+        )
+
+    if not hass.services.has_service(DOMAIN, SERVICE_SET_CYCLE_RANGE):
+        hass.services.async_register(
+            DOMAIN,
+            SERVICE_SET_CYCLE_RANGE,
+            async_set_range,
+            schema=vol.Schema(
+                {
+                    **common_profile_field,
+                    vol.Required(SERVICE_FIELD_START_DATE): cv.string,
+                    vol.Required(SERVICE_FIELD_END_DATE): cv.string,
+                }
+            ),
         )
 
     if not hass.services.has_service(DOMAIN, SERVICE_SET_CYCLE_HISTORY):
@@ -342,6 +362,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         for service in (
             SERVICE_ADD_CYCLE_START,
             SERVICE_REMOVE_CYCLE_START,
+            SERVICE_SET_CYCLE_RANGE,
             SERVICE_SET_CYCLE_HISTORY,
             SERVICE_SET_PERIOD_DURATION,
             SERVICE_ERASE_ALL_HISTORY,
@@ -366,6 +387,25 @@ async def _async_handle_remove(hass: HomeAssistant, call: ServiceCall) -> None:
     runtime = _runtime_for_call(hass, call)
     date_iso = _normalize_date_or_raise(call.data[SERVICE_FIELD_DATE])
     runtime.history = [item for item in runtime.history if item != date_iso]
+    await _async_save_and_notify(hass, runtime)
+
+
+async def _async_handle_set_range(hass: HomeAssistant, call: ServiceCall) -> None:
+    """Add every bleeding day in an inclusive, chronologically ordered range."""
+    runtime = _runtime_for_call(hass, call)
+    start_iso = _normalize_date_or_raise(call.data[SERVICE_FIELD_START_DATE])
+    end_iso = _normalize_date_or_raise(call.data[SERVICE_FIELD_END_DATE])
+    start = date.fromisoformat(start_iso)
+    end = date.fromisoformat(end_iso)
+    if end < start:
+        raise HomeAssistantError("End date must be on or after start date.")
+    if (end - start).days > 90:
+        raise HomeAssistantError("Cycle range cannot be longer than 90 days.")
+
+    runtime.history.extend(
+        (start + timedelta(days=offset)).isoformat()
+        for offset in range((end - start).days + 1)
+    )
     await _async_save_and_notify(hass, runtime)
 
 

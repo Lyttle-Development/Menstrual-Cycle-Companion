@@ -135,9 +135,12 @@ data:
 
 Exports are written to `<config>/menstrual_cycle_companion_exports/`.
 
-## Daily refresh automation
+## Automatic refresh
 
-The integration updates on startup and around midnight. The optional example in [`examples/daily_recalculate_days_until_next_start.yaml`](examples/daily_recalculate_days_until_next_start.yaml) can be imported as an automation if you want an explicit daily refresh.
+The integration recalculates the cycle model when history or period-duration
+data changes, on startup, and automatically every two hours. The gauge card
+also provides a **Refresh** button for an on-demand recalculation. No separate
+Home Assistant automation is required.
 
 ## Cards
 

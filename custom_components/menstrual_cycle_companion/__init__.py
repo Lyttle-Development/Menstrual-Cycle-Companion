@@ -17,7 +17,7 @@ from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.dispatcher import async_dispatcher_send
-from homeassistant.helpers.event import async_track_time_change
+from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.util import slugify
 
 from .const import (
@@ -56,6 +56,7 @@ from .storage import MenstrualCycleStorage
 
 PLATFORMS: list[Platform] = [Platform.SENSOR]
 EXPORT_DIR_NAME = "menstrual_cycle_companion_exports"
+MODEL_REFRESH_INTERVAL = timedelta(hours=2)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -220,12 +221,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         period_duration_days=stored.get(ATTR_PERIOD_DURATION_DAYS, DEFAULT_PERIOD_DURATION_DAYS),
     )
 
-    runtime.unregister_midnight_listener = async_track_time_change(
+    runtime.unregister_midnight_listener = async_track_time_interval(
         hass,
         lambda now: hass.async_create_task(_async_refresh_cycle_model(hass, {entry.entry_id})),
-        hour=0,
-        minute=0,
-        second=5,
+        MODEL_REFRESH_INTERVAL,
     )
 
     hass.data[DOMAIN][entry.entry_id] = runtime

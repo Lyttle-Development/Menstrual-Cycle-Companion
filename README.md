@@ -169,6 +169,11 @@ Cycle history is sensitive health information. Keep Home Assistant access restri
 
 The repository includes HACS and Hassfest workflows. Python tests and Home Assistant test fixtures should be added before publishing a stable release. Validate JSON and YAML files and run JavaScript syntax checks in CI.
 
+To publish a HACS-detectable release, update `version.json` (`major`, `minor`, or
+`patch`) and push the change to `main`. The publishing workflow synchronizes the
+integration manifest, creates a matching `v<major>.<minor>.<patch>` GitHub release,
+and HACS can then detect that version.
+
 Before publishing to HACS, set a non-empty description and valid topics in the GitHub repository's **About** settings (at minimum `home-assistant` and `hacs`). The CI workflow currently skips only those two API-managed checks because repository settings cannot be stored in this repository.
 
 ## License

@@ -1,0 +1,19 @@
+name: Validate version
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Validate semantic version and manifest
+        run: |
+          python scripts/version.py
+          python scripts/version.py --write-manifest custom_components/menstrual_cycle_companion/manifest.json
+          git diff --exit-code -- custom_components/menstrual_cycle_companion/manifest.json
+

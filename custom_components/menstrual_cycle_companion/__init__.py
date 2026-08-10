@@ -1160,9 +1160,10 @@ async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     old_name = str(entry.data.get(CONF_NAME, DEFAULT_NAME)).strip() or DEFAULT_NAME
     profile = slugify(old_name).strip("_") or "default"
     new_data = {
+        **entry.data,
         CONF_PROFILE: profile,
         CONF_FRIENDLY_NAME: old_name,
-        CONF_ICON: "",
+        CONF_ICON: str(entry.data.get(CONF_ICON, "")).strip(),
     }
     hass.config_entries.async_update_entry(entry, data=new_data, title=old_name, version=2)
     return True
@@ -1242,6 +1243,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         for service in (
             SERVICE_ADD_CYCLE_START,
             SERVICE_REMOVE_CYCLE_START,
+            SERVICE_SET_CYCLE_RANGE,
             SERVICE_SET_CYCLE_HISTORY,
             SERVICE_SET_PERIOD_DURATION,
             SERVICE_ERASE_ALL_HISTORY,
@@ -1263,6 +1265,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             SERVICE_SET_MENOPAUSE_MODE,
             SERVICE_UPDATE_MENOPAUSE_DATE,
             SERVICE_SAVE_TIMER_STATE,
+            SERVICE_EXPORT_DOCTOR_REPORT,
         ):
             if hass.services.has_service(DOMAIN, service):
                 hass.services.async_remove(DOMAIN, service)

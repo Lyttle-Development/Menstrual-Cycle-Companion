@@ -214,6 +214,7 @@ class MenstruationStorage:
             data.get("pre_menarche_data"),
             data.get("menopause_data"),
             data.get("noncycle_data"),
+            cycle_length_override=data.get("cycle_length_override"),
         )
 
     async def async_load_pregnancy_data(self) -> dict[str, Any]:
@@ -234,6 +235,7 @@ class MenstruationStorage:
             data.get("pre_menarche_data"),
             data.get("menopause_data"),
             data.get("noncycle_data"),
+            cycle_length_override=data.get("cycle_length_override"),
         )
 
     async def async_load_menarche_data(self) -> dict[str, Any]:
@@ -254,6 +256,7 @@ class MenstruationStorage:
             data.get("pre_menarche_data"),
             data.get("menopause_data"),
             data.get("noncycle_data"),
+            cycle_length_override=data.get("cycle_length_override"),
         )
 
     @staticmethod

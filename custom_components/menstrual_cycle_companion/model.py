@@ -14,6 +14,7 @@ from .const import (
     DEFAULT_PERIOD_DURATION_DAYS,
     STATE_FERTILE,
     STATE_MENARCHE,
+    STATE_MENOPAUSE,
     STATE_NEUTRAL,
     STATE_PERIOD,
     STATE_PMS,
@@ -1454,7 +1455,9 @@ def build_cycle_model(
         )
 
     state = STATE_NEUTRAL
-    if current_period and current_period.get("is_active"):
+    if meno_data.get("is_menopause"):
+        state = STATE_MENOPAUSE
+    elif current_period and current_period.get("is_active"):
         state = STATE_PERIOD
     elif now.isoformat() in set(normalized):
         state = STATE_PERIOD

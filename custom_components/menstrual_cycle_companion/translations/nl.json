@@ -1,0 +1,686 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Menstrual Cycle Companion",
+        "description": "Create a profile (username + friendly name) for cycle tracking.",
+        "data": {
+          "profile": "Username/Profile",
+          "friendly_name": "Friendly name",
+          "icon": "Icon (optional, e.g. mdi:calendar-heart)"
+        }
+      }
+    },
+    "error": {
+      "invalid_profile": "Profile must contain letters or numbers."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Menstrual Cycle Companion Settings",
+        "description": "Adjust cycle tracking settings. Changes are saved immediately.",
+        "data": {
+          "friendly_name": "Display name",
+          "icon": "Icon (optional, e.g. mdi:calendar-heart)",
+          "period_duration_days": "Period duration (days)",
+          "pregnancy_enabled": "Enable pregnancy mode",
+          "pregnancy_start_date": "Pregnancy start date (YYYY-MM-DD)",
+          "pre_menarche_enabled": "Enable pre-menarche tracking",
+          "estimated_menarche_date": "Estimated menarche date (YYYY-MM-DD)",
+          "family_menarche_age": "Family menarche age (8–20, optional)",
+          "menopause_enabled": "Enable menopause mode",
+          "menopause_start_date": "Menopause start date (YYYY-MM-DD)",
+          "cycle_length_override": "Cycle length override (days, 0 = auto)",
+          "nfp_analysis_mode": "NFP analysis mode",
+          "num_predictions": "Aantal toekomstige cyclusvoorspellingen"
+        },
+        "data_description": {
+          "period_duration_days": "Number of days the period typically lasts (1–14).",
+          "pregnancy_enabled": "Activates pregnancy tracking mode. The pregnancy start date is auto-filled from the last cycle start if left empty.",
+          "pregnancy_start_date": "First day of last menstruation (LMP). Leave empty to use the last recorded cycle start.",
+          "pre_menarche_enabled": "Track puberty signs before the first period (menarche).",
+          "estimated_menarche_date": "Estimated date of the first period. Used for countdown tracking.",
+          "family_menarche_age": "Age of menarche in the family (mother/sister) used to estimate the expected age.",
+          "menopause_enabled": "Activates menopause tracking mode.",
+          "menopause_start_date": "Date when menopause started (YYYY-MM-DD). Leave empty if unknown.",
+          "cycle_length_override": "Override the automatically calculated average cycle length. Set to 0 to use the auto-calculated value from your history (recommended). Set to 20–38 to manually fix the cycle length used for fertile window and ovulation calculations.",
+          "nfp_analysis_mode": "Controls how ovulation and the fertile window are calculated. 'hybrid' (default) learns from observed temperature data and falls back to the statistical formula. 'strict' only shows ovulation and the fertile window when a temperature rise is confirmed in the current cycle.",
+          "num_predictions": "Aantal toekomstige cyclusstarts (1-12). Standaard: 6."
+        }
+      }
+    },
+    "error": {
+      "invalid_date": "Invalid date format. Please use YYYY-MM-DD.",
+      "invalid_menarche_age": "Age must be a number between 8 and 20."
+    }
+  },
+  "services": {
+    "add_cycle_start": {
+      "name": "Cyclusdag toevoegen",
+      "description": "Dienst voor cyclusdag toevoegen.",
+      "fields": {
+        "entity_id": {
+          "name": "Entiteit",
+          "description": "Waarde voor entiteit."
+        },
+        "profile": {
+          "name": "Profiel",
+          "description": "Waarde voor profiel."
+        },
+        "entry_id": {
+          "name": "Configuratie-ID",
+          "description": "Waarde voor configuratie-id."
+        },
+        "date": {
+          "name": "Datum",
+          "description": "Waarde voor datum."
+        }
+      }
+    },
+    "remove_cycle_start": {
+      "name": "Cyclusdag verwijderen",
+      "description": "Dienst voor cyclusdag verwijderen.",
+      "fields": {
+        "entity_id": {
+          "name": "Entiteit",
+          "description": "Waarde voor entiteit."
+        },
+        "profile": {
+          "name": "Profiel",
+          "description": "Waarde voor profiel."
+        },
+        "entry_id": {
+          "name": "Configuratie-ID",
+          "description": "Waarde voor configuratie-id."
+        },
+        "date": {
+          "name": "Datum",
+          "description": "Waarde voor datum."
+        }
+      }
+    },
+    "set_cycle_range": {
+      "name": "Cyclusperiode instellen",
+      "description": "Dienst voor cyclusperiode instellen.",
+      "fields": {
+        "entity_id": {
+          "name": "Entiteit",
+          "description": "Waarde voor entiteit."
+        },
+        "profile": {
+          "name": "Profiel",
+          "description": "Waarde voor profiel."
+        },
+        "entry_id": {
+          "name": "Configuratie-ID",
+          "description": "Waarde voor configuratie-id."
+        },
+        "start_date": {
+          "name": "Startdatum",
+          "description": "Waarde voor startdatum."
+        },
+        "end_date": {
+          "name": "Einddatum",
+          "description": "Waarde voor einddatum."
+        }
+      }
+    },
+    "set_cycle_history": {
+      "name": "Cyclusgeschiedenis vervangen",
+      "description": "Dienst voor cyclusgeschiedenis vervangen.",
+      "fields": {
+        "entity_id": {
+          "name": "Entiteit",
+          "description": "Waarde voor entiteit."
+        },
+        "profile": {
+          "name": "Profiel",
+          "description": "Waarde voor profiel."
+        },
+        "entry_id": {
+          "name": "Configuratie-ID",
+          "description": "Waarde voor configuratie-id."
+        },
+        "dates": {
+          "name": "Datums",
+          "description": "Waarde voor datums."
+        }
+      }
+    },
+    "set_period_duration": {
+      "name": "Duur van de menstruatie instellen",
+      "description": "Dienst voor duur van de menstruatie instellen.",
+      "fields": {
+        "entity_id": {
+          "name": "Entiteit",
+          "description": "Waarde voor entiteit."
+        },
+        "profile": {
+          "name": "Profiel",
+          "description": "Waarde voor profiel."
+        },
+        "entry_id": {
+          "name": "Configuratie-ID",
+          "description": "Waarde voor configuratie-id."
+        },
+        "days": {
+          "name": "Dagen",
+          "description": "Waarde voor dagen."
+        }
+      }
+    },
+    "erase_all_history": {
+      "name": "Alle cyclusgeschiedenis wissen",
+      "description": "Dienst voor alle cyclusgeschiedenis wissen.",
+      "fields": {
+        "entity_id": {
+          "name": "Entiteit",
+          "description": "Waarde voor entiteit."
+        },
+        "profile": {
+          "name": "Profiel",
+          "description": "Waarde voor profiel."
+        },
+        "entry_id": {
+          "name": "Configuratie-ID",
+          "description": "Waarde voor configuratie-id."
+        },
+        "erase_all": {
+          "name": "Alles wissen",
+          "description": "Waarde voor alles wissen."
+        }
+      }
+    },
+    "export_history": {
+      "name": "Cyclusgeschiedenis exporteren",
+      "description": "Dienst voor cyclusgeschiedenis exporteren.",
+      "fields": {
+        "entity_id": {
+          "name": "Entiteit",
+          "description": "Waarde voor entiteit."
+        },
+        "profile": {
+          "name": "Profiel",
+          "description": "Waarde voor profiel."
+        },
+        "entry_id": {
+          "name": "Configuratie-ID",
+          "description": "Waarde voor configuratie-id."
+        },
+        "format": {
+          "name": "Indeling",
+          "description": "Waarde voor indeling."
+        },
+        "filename": {
+          "name": "Bestandsnaam",
+          "description": "Waarde voor bestandsnaam."
+        }
+      }
+    },
+    "refresh_cycle_model": {
+      "name": "Cyclusmodel vernieuwen",
+      "description": "Dienst voor cyclusmodel vernieuwen.",
+      "fields": {
+        "entity_id": {
+          "name": "Entiteit",
+          "description": "Waarde voor entiteit."
+        },
+        "profile": {
+          "name": "Profiel",
+          "description": "Waarde voor profiel."
+        },
+        "entry_id": {
+          "name": "Configuratie-ID",
+          "description": "Waarde voor configuratie-id."
+        }
+      }
+    },
+    "log_product_usage": {
+      "name": "Productgebruik registreren",
+      "description": "Dienst voor productgebruik registreren.",
+      "fields": {
+        "entity_id": {
+          "name": "Entiteit",
+          "description": "Waarde voor entiteit."
+        },
+        "profile": {
+          "name": "Profiel",
+          "description": "Waarde voor profiel."
+        },
+        "entry_id": {
+          "name": "Configuratie-ID",
+          "description": "Waarde voor configuratie-id."
+        },
+        "product": {
+          "name": "Product",
+          "description": "Waarde voor product."
+        },
+        "action": {
+          "name": "Actie",
+          "description": "Waarde voor actie."
+        },
+        "quantity": {
+          "name": "Aantal",
+          "description": "Waarde voor aantal."
+        },
+        "date": {
+          "name": "Datum",
+          "description": "Waarde voor datum."
+        }
+      }
+    },
+    "manage_household_inventory": {
+      "name": "Voorraad in huis beheren",
+      "description": "Dienst voor voorraad in huis beheren.",
+      "fields": {
+        "inventory_action": {
+          "name": "Voorraadactie",
+          "description": "Waarde voor voorraadactie."
+        },
+        "product": {
+          "name": "Product",
+          "description": "Waarde voor product."
+        },
+        "quantity": {
+          "name": "Aantal",
+          "description": "Waarde voor aantal."
+        },
+        "warning_threshold": {
+          "name": "Waarschuwingsdrempel",
+          "description": "Waarde voor waarschuwingsdrempel."
+        },
+        "critical_threshold": {
+          "name": "Kritieke drempel",
+          "description": "Waarde voor kritieke drempel."
+        },
+        "member": {
+          "name": "Lid",
+          "description": "Waarde voor lid."
+        },
+        "underwear_total_owned": {
+          "name": "Underwear Total Owned",
+          "description": "Waarde voor underwear total owned."
+        }
+      }
+    },
+    "add_symptom": {
+      "name": "Symptoom toevoegen",
+      "description": "Dienst voor symptoom toevoegen.",
+      "fields": {
+        "entity_id": {
+          "name": "Entiteit",
+          "description": "Waarde voor entiteit."
+        },
+        "profile": {
+          "name": "Profiel",
+          "description": "Waarde voor profiel."
+        },
+        "entry_id": {
+          "name": "Configuratie-ID",
+          "description": "Waarde voor configuratie-id."
+        },
+        "date": {
+          "name": "Datum",
+          "description": "Waarde voor datum."
+        },
+        "symptom_data": {
+          "name": "Symptoomgegevens",
+          "description": "Waarde voor symptoomgegevens."
+        }
+      }
+    },
+    "remove_symptom": {
+      "name": "Symptoom verwijderen",
+      "description": "Dienst voor symptoom verwijderen.",
+      "fields": {
+        "entity_id": {
+          "name": "Entiteit",
+          "description": "Waarde voor entiteit."
+        },
+        "profile": {
+          "name": "Profiel",
+          "description": "Waarde voor profiel."
+        },
+        "entry_id": {
+          "name": "Configuratie-ID",
+          "description": "Waarde voor configuratie-id."
+        },
+        "date": {
+          "name": "Datum",
+          "description": "Waarde voor datum."
+        }
+      }
+    },
+    "get_symptom": {
+      "name": "Symptoom ophalen",
+      "description": "Dienst voor symptoom ophalen.",
+      "fields": {
+        "entity_id": {
+          "name": "Entiteit",
+          "description": "Waarde voor entiteit."
+        },
+        "profile": {
+          "name": "Profiel",
+          "description": "Waarde voor profiel."
+        },
+        "entry_id": {
+          "name": "Configuratie-ID",
+          "description": "Waarde voor configuratie-id."
+        },
+        "date": {
+          "name": "Datum",
+          "description": "Waarde voor datum."
+        }
+      }
+    },
+    "set_pregnancy_mode": {
+      "name": "Zwangerschapsmodus instellen",
+      "description": "Dienst voor zwangerschapsmodus instellen.",
+      "fields": {
+        "entity_id": {
+          "name": "Entiteit",
+          "description": "Waarde voor entiteit."
+        },
+        "profile": {
+          "name": "Profiel",
+          "description": "Waarde voor profiel."
+        },
+        "entry_id": {
+          "name": "Configuratie-ID",
+          "description": "Waarde voor configuratie-id."
+        },
+        "is_pregnant": {
+          "name": "Zwanger",
+          "description": "Waarde voor zwanger."
+        },
+        "pregnancy_start_date": {
+          "name": "Start van zwangerschap",
+          "description": "Waarde voor start van zwangerschap."
+        }
+      }
+    },
+    "update_pregnancy_date": {
+      "name": "Zwangerschapsdatum bijwerken",
+      "description": "Dienst voor zwangerschapsdatum bijwerken.",
+      "fields": {
+        "entity_id": {
+          "name": "Entiteit",
+          "description": "Waarde voor entiteit."
+        },
+        "profile": {
+          "name": "Profiel",
+          "description": "Waarde voor profiel."
+        },
+        "entry_id": {
+          "name": "Configuratie-ID",
+          "description": "Waarde voor configuratie-id."
+        },
+        "pregnancy_start_date": {
+          "name": "Start van zwangerschap",
+          "description": "Waarde voor start van zwangerschap."
+        }
+      }
+    },
+    "set_menarche_mode": {
+      "name": "Menarchemodus instellen",
+      "description": "Dienst voor menarchemodus instellen.",
+      "fields": {
+        "entity_id": {
+          "name": "Entiteit",
+          "description": "Waarde voor entiteit."
+        },
+        "profile": {
+          "name": "Profiel",
+          "description": "Waarde voor profiel."
+        },
+        "entry_id": {
+          "name": "Configuratie-ID",
+          "description": "Waarde voor configuratie-id."
+        },
+        "is_menarche": {
+          "name": "Is Menarche",
+          "description": "Waarde voor is menarche."
+        },
+        "estimated_menarche_date": {
+          "name": "Geschatte menarchedatum",
+          "description": "Waarde voor geschatte menarchedatum."
+        },
+        "family_menarche_age": {
+          "name": "Menarcheleeftijd in de familie",
+          "description": "Waarde voor menarcheleeftijd in de familie."
+        }
+      }
+    },
+    "update_menarche_date": {
+      "name": "Menarchedatum bijwerken",
+      "description": "Dienst voor menarchedatum bijwerken.",
+      "fields": {
+        "entity_id": {
+          "name": "Entiteit",
+          "description": "Waarde voor entiteit."
+        },
+        "profile": {
+          "name": "Profiel",
+          "description": "Waarde voor profiel."
+        },
+        "entry_id": {
+          "name": "Configuratie-ID",
+          "description": "Waarde voor configuratie-id."
+        },
+        "date": {
+          "name": "Datum",
+          "description": "Waarde voor datum."
+        }
+      }
+    },
+    "log_first_period": {
+      "name": "Eerste menstruatie registreren",
+      "description": "Dienst voor eerste menstruatie registreren.",
+      "fields": {
+        "entity_id": {
+          "name": "Entiteit",
+          "description": "Waarde voor entiteit."
+        },
+        "profile": {
+          "name": "Profiel",
+          "description": "Waarde voor profiel."
+        },
+        "entry_id": {
+          "name": "Configuratie-ID",
+          "description": "Waarde voor configuratie-id."
+        },
+        "date": {
+          "name": "Datum",
+          "description": "Waarde voor datum."
+        }
+      }
+    },
+    "get_menarche_info": {
+      "name": "Menarchegegevens ophalen",
+      "description": "Dienst voor menarchegegevens ophalen.",
+      "fields": {
+        "entity_id": {
+          "name": "Entiteit",
+          "description": "Waarde voor entiteit."
+        },
+        "profile": {
+          "name": "Profiel",
+          "description": "Waarde voor profiel."
+        },
+        "entry_id": {
+          "name": "Configuratie-ID",
+          "description": "Waarde voor configuratie-id."
+        }
+      }
+    },
+    "add_pre_menarche_sign": {
+      "name": "Teken vóór menarche toevoegen",
+      "description": "Dienst voor teken vóór menarche toevoegen.",
+      "fields": {
+        "entity_id": {
+          "name": "Entiteit",
+          "description": "Waarde voor entiteit."
+        },
+        "profile": {
+          "name": "Profiel",
+          "description": "Waarde voor profiel."
+        },
+        "entry_id": {
+          "name": "Configuratie-ID",
+          "description": "Waarde voor configuratie-id."
+        },
+        "pre_menarche_sign": {
+          "name": "Teken vóór menarche",
+          "description": "Waarde voor teken vóór menarche."
+        },
+        "tanner_stage": {
+          "name": "Tanner-stadium",
+          "description": "Waarde voor tanner-stadium."
+        }
+      }
+    },
+    "remove_pre_menarche_sign": {
+      "name": "Teken vóór menarche verwijderen",
+      "description": "Dienst voor teken vóór menarche verwijderen.",
+      "fields": {
+        "entity_id": {
+          "name": "Entiteit",
+          "description": "Waarde voor entiteit."
+        },
+        "profile": {
+          "name": "Profiel",
+          "description": "Waarde voor profiel."
+        },
+        "entry_id": {
+          "name": "Configuratie-ID",
+          "description": "Waarde voor configuratie-id."
+        },
+        "pre_menarche_sign": {
+          "name": "Teken vóór menarche",
+          "description": "Waarde voor teken vóór menarche."
+        }
+      }
+    },
+    "set_menopause_mode": {
+      "name": "Menopauzemodus instellen",
+      "description": "Dienst voor menopauzemodus instellen.",
+      "fields": {
+        "entity_id": {
+          "name": "Entiteit",
+          "description": "Waarde voor entiteit."
+        },
+        "profile": {
+          "name": "Profiel",
+          "description": "Waarde voor profiel."
+        },
+        "entry_id": {
+          "name": "Configuratie-ID",
+          "description": "Waarde voor configuratie-id."
+        },
+        "is_menopause": {
+          "name": "Menopauze",
+          "description": "Waarde voor menopauze."
+        },
+        "menopause_start_date": {
+          "name": "Start van menopauze",
+          "description": "Waarde voor start van menopauze."
+        }
+      }
+    },
+    "update_menopause_date": {
+      "name": "Menopauzedatum bijwerken",
+      "description": "Dienst voor menopauzedatum bijwerken.",
+      "fields": {
+        "entity_id": {
+          "name": "Entiteit",
+          "description": "Waarde voor entiteit."
+        },
+        "profile": {
+          "name": "Profiel",
+          "description": "Waarde voor profiel."
+        },
+        "entry_id": {
+          "name": "Configuratie-ID",
+          "description": "Waarde voor configuratie-id."
+        },
+        "menopause_start_date": {
+          "name": "Start van menopauze",
+          "description": "Waarde voor start van menopauze."
+        }
+      }
+    },
+    "save_timer_state": {
+      "name": "Timerstatus opslaan",
+      "description": "Dienst voor timerstatus opslaan.",
+      "fields": {
+        "entity_id": {
+          "name": "Entiteit",
+          "description": "Waarde voor entiteit."
+        },
+        "profile": {
+          "name": "Profiel",
+          "description": "Waarde voor profiel."
+        },
+        "entry_id": {
+          "name": "Configuratie-ID",
+          "description": "Waarde voor configuratie-id."
+        },
+        "remaining_seconds": {
+          "name": "Resterende seconden",
+          "description": "Waarde voor resterende seconden."
+        },
+        "total_seconds": {
+          "name": "Totale seconden",
+          "description": "Waarde voor totale seconden."
+        },
+        "selected_product": {
+          "name": "Geselecteerd product",
+          "description": "Waarde voor geselecteerd product."
+        },
+        "is_running": {
+          "name": "Actief",
+          "description": "Waarde voor actief."
+        },
+        "saved_at": {
+          "name": "Opgeslagen op",
+          "description": "Waarde voor opgeslagen op."
+        }
+      }
+    },
+    "export_doctor_report": {
+      "name": "Medisch rapport exporteren",
+      "description": "Dienst voor medisch rapport exporteren.",
+      "fields": {
+        "entity_id": {
+          "name": "Entiteit",
+          "description": "Waarde voor entiteit."
+        },
+        "profile": {
+          "name": "Profiel",
+          "description": "Waarde voor profiel."
+        },
+        "entry_id": {
+          "name": "Configuratie-ID",
+          "description": "Waarde voor configuratie-id."
+        },
+        "days_back": {
+          "name": "Dagen terug",
+          "description": "Waarde voor dagen terug."
+        },
+        "patient_name": {
+          "name": "Naam van persoon",
+          "description": "Waarde voor naam van persoon."
+        },
+        "patient_birthdate": {
+          "name": "Geboortedatum",
+          "description": "Waarde voor geboortedatum."
+        },
+        "language": {
+          "name": "Taal",
+          "description": "Waarde voor taal."
+        }
+      }
+    }
+  }
+}

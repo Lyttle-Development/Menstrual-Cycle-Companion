@@ -32,7 +32,8 @@
           "menopause_enabled": "Activer le mode ménopause",
           "menopause_start_date": "Date de début de la ménopause (AAAA-MM-JJ)",
           "cycle_length_override": "Forcer la durée du cycle (jours, 0 = automatique)",
-          "nfp_analysis_mode": "Mode d'analyse PFN"
+          "nfp_analysis_mode": "Mode d'analyse PFN",
+          "num_predictions": "Nombre de previsions futures du cycle"
         },
         "data_description": {
           "period_duration_days": "Nombre de jours que durent habituellement les règles (1–14).",
@@ -44,7 +45,8 @@
           "menopause_enabled": "Active le mode de suivi de la ménopause.",
           "menopause_start_date": "Date à laquelle la ménopause a commencé (AAAA-MM-JJ). Laissez vide si inconnue.",
           "cycle_length_override": "Remplace la durée moyenne du cycle calculée automatiquement. Mettez 0 pour utiliser la valeur calculée automatiquement à partir de votre historique (recommandé). Mettez une valeur entre 20 et 38 pour fixer manuellement la durée du cycle utilisée pour le calcul de la fenêtre fertile et de l'ovulation.",
-          "nfp_analysis_mode": "Détermine la façon dont l'ovulation et la fenêtre fertile sont calculées. Le mode « hybride » (par défaut) apprend à partir des données de température observées et se rabat sur la formule statistique si besoin. Le mode « strict » n'affiche l'ovulation et la fenêtre fertile que lorsqu'une hausse de température est confirmée dans le cycle en cours."
+          "nfp_analysis_mode": "Détermine la façon dont l'ovulation et la fenêtre fertile sont calculées. Le mode « hybride » (par défaut) apprend à partir des données de température observées et se rabat sur la formule statistique si besoin. Le mode « strict » n'affiche l'ovulation et la fenêtre fertile que lorsqu'une hausse de température est confirmée dans le cycle en cours.",
+          "num_predictions": "Nombre de debuts de cycle futurs a generer (1-12). Valeur par defaut : 6."
         }
       }
     },
@@ -54,37 +56,629 @@
     }
   },
   "services": {
-    "log_product_usage": {
-      "name": "Enregistrer l'utilisation d'un produit",
-      "description": "Enregistre l'utilisation de produits d'hygiène menstruelle pour les intégrations de minuterie et les statistiques à long terme.",
+    "add_cycle_start": {
+      "name": "Ajouter un jour du cycle",
+      "description": "Service pour ajouter un jour du cycle.",
       "fields": {
         "entity_id": {
           "name": "Entité",
-          "description": "Capteur de jauge de menstruation ciblé."
+          "description": "Valeur pour entité."
         },
         "profile": {
           "name": "Profil",
-          "description": "Identifiant (slug) du profil configuré."
+          "description": "Valeur pour profil."
         },
         "entry_id": {
-          "name": "ID d'entrée",
-          "description": "Identifiant de l'entrée de configuration."
-        },
-        "product": {
-          "name": "Produit",
-          "description": "Type de produit à enregistrer."
-        },
-        "action": {
-          "name": "Action",
-          "description": "Action d'utilisation, par exemple utilisé ou vidé."
-        },
-        "quantity": {
-          "name": "Quantité",
-          "description": "Nombre de produits ou d'événements de vidage à ajouter."
+          "name": "ID de configuration",
+          "description": "Valeur pour id de configuration."
         },
         "date": {
           "name": "Date",
-          "description": "Date ISO facultative pour une saisie rétroactive. Par défaut, aujourd'hui."
+          "description": "Valeur pour date."
+        }
+      }
+    },
+    "remove_cycle_start": {
+      "name": "Supprimer un jour du cycle",
+      "description": "Service pour supprimer un jour du cycle.",
+      "fields": {
+        "entity_id": {
+          "name": "Entité",
+          "description": "Valeur pour entité."
+        },
+        "profile": {
+          "name": "Profil",
+          "description": "Valeur pour profil."
+        },
+        "entry_id": {
+          "name": "ID de configuration",
+          "description": "Valeur pour id de configuration."
+        },
+        "date": {
+          "name": "Date",
+          "description": "Valeur pour date."
+        }
+      }
+    },
+    "set_cycle_range": {
+      "name": "Définir une période du cycle",
+      "description": "Service pour définir une période du cycle.",
+      "fields": {
+        "entity_id": {
+          "name": "Entité",
+          "description": "Valeur pour entité."
+        },
+        "profile": {
+          "name": "Profil",
+          "description": "Valeur pour profil."
+        },
+        "entry_id": {
+          "name": "ID de configuration",
+          "description": "Valeur pour id de configuration."
+        },
+        "start_date": {
+          "name": "Date de début",
+          "description": "Valeur pour date de début."
+        },
+        "end_date": {
+          "name": "Date de fin",
+          "description": "Valeur pour date de fin."
+        }
+      }
+    },
+    "set_cycle_history": {
+      "name": "Remplacer l’historique du cycle",
+      "description": "Service pour remplacer l’historique du cycle.",
+      "fields": {
+        "entity_id": {
+          "name": "Entité",
+          "description": "Valeur pour entité."
+        },
+        "profile": {
+          "name": "Profil",
+          "description": "Valeur pour profil."
+        },
+        "entry_id": {
+          "name": "ID de configuration",
+          "description": "Valeur pour id de configuration."
+        },
+        "dates": {
+          "name": "Dates",
+          "description": "Valeur pour dates."
+        }
+      }
+    },
+    "set_period_duration": {
+      "name": "Définir la durée des règles",
+      "description": "Service pour définir la durée des règles.",
+      "fields": {
+        "entity_id": {
+          "name": "Entité",
+          "description": "Valeur pour entité."
+        },
+        "profile": {
+          "name": "Profil",
+          "description": "Valeur pour profil."
+        },
+        "entry_id": {
+          "name": "ID de configuration",
+          "description": "Valeur pour id de configuration."
+        },
+        "days": {
+          "name": "Jours",
+          "description": "Valeur pour jours."
+        }
+      }
+    },
+    "erase_all_history": {
+      "name": "Effacer tout l’historique",
+      "description": "Service pour effacer tout l’historique.",
+      "fields": {
+        "entity_id": {
+          "name": "Entité",
+          "description": "Valeur pour entité."
+        },
+        "profile": {
+          "name": "Profil",
+          "description": "Valeur pour profil."
+        },
+        "entry_id": {
+          "name": "ID de configuration",
+          "description": "Valeur pour id de configuration."
+        },
+        "erase_all": {
+          "name": "Tout effacer",
+          "description": "Valeur pour tout effacer."
+        }
+      }
+    },
+    "export_history": {
+      "name": "Exporter l’historique du cycle",
+      "description": "Service pour exporter l’historique du cycle.",
+      "fields": {
+        "entity_id": {
+          "name": "Entité",
+          "description": "Valeur pour entité."
+        },
+        "profile": {
+          "name": "Profil",
+          "description": "Valeur pour profil."
+        },
+        "entry_id": {
+          "name": "ID de configuration",
+          "description": "Valeur pour id de configuration."
+        },
+        "format": {
+          "name": "Format",
+          "description": "Valeur pour format."
+        },
+        "filename": {
+          "name": "Nom de fichier",
+          "description": "Valeur pour nom de fichier."
+        }
+      }
+    },
+    "refresh_cycle_model": {
+      "name": "Actualiser le modèle du cycle",
+      "description": "Service pour actualiser le modèle du cycle.",
+      "fields": {
+        "entity_id": {
+          "name": "Entité",
+          "description": "Valeur pour entité."
+        },
+        "profile": {
+          "name": "Profil",
+          "description": "Valeur pour profil."
+        },
+        "entry_id": {
+          "name": "ID de configuration",
+          "description": "Valeur pour id de configuration."
+        }
+      }
+    },
+    "log_product_usage": {
+      "name": "Enregistrer l’utilisation d’un produit",
+      "description": "Service pour enregistrer l’utilisation d’un produit.",
+      "fields": {
+        "entity_id": {
+          "name": "Entité",
+          "description": "Valeur pour entité."
+        },
+        "profile": {
+          "name": "Profil",
+          "description": "Valeur pour profil."
+        },
+        "entry_id": {
+          "name": "ID de configuration",
+          "description": "Valeur pour id de configuration."
+        },
+        "product": {
+          "name": "Produit",
+          "description": "Valeur pour produit."
+        },
+        "action": {
+          "name": "Action",
+          "description": "Valeur pour action."
+        },
+        "quantity": {
+          "name": "Quantité",
+          "description": "Valeur pour quantité."
+        },
+        "date": {
+          "name": "Date",
+          "description": "Valeur pour date."
+        }
+      }
+    },
+    "manage_household_inventory": {
+      "name": "Gérer le stock du foyer",
+      "description": "Service pour gérer le stock du foyer.",
+      "fields": {
+        "inventory_action": {
+          "name": "Action sur le stock",
+          "description": "Valeur pour action sur le stock."
+        },
+        "product": {
+          "name": "Produit",
+          "description": "Valeur pour produit."
+        },
+        "quantity": {
+          "name": "Quantité",
+          "description": "Valeur pour quantité."
+        },
+        "warning_threshold": {
+          "name": "Seuil d’avertissement",
+          "description": "Valeur pour seuil d’avertissement."
+        },
+        "critical_threshold": {
+          "name": "Seuil critique",
+          "description": "Valeur pour seuil critique."
+        },
+        "member": {
+          "name": "Membre",
+          "description": "Valeur pour membre."
+        },
+        "underwear_total_owned": {
+          "name": "Underwear Total Owned",
+          "description": "Valeur pour underwear total owned."
+        }
+      }
+    },
+    "add_symptom": {
+      "name": "Ajouter un symptôme",
+      "description": "Service pour ajouter un symptôme.",
+      "fields": {
+        "entity_id": {
+          "name": "Entité",
+          "description": "Valeur pour entité."
+        },
+        "profile": {
+          "name": "Profil",
+          "description": "Valeur pour profil."
+        },
+        "entry_id": {
+          "name": "ID de configuration",
+          "description": "Valeur pour id de configuration."
+        },
+        "date": {
+          "name": "Date",
+          "description": "Valeur pour date."
+        },
+        "symptom_data": {
+          "name": "Données des symptômes",
+          "description": "Valeur pour données des symptômes."
+        }
+      }
+    },
+    "remove_symptom": {
+      "name": "Supprimer un symptôme",
+      "description": "Service pour supprimer un symptôme.",
+      "fields": {
+        "entity_id": {
+          "name": "Entité",
+          "description": "Valeur pour entité."
+        },
+        "profile": {
+          "name": "Profil",
+          "description": "Valeur pour profil."
+        },
+        "entry_id": {
+          "name": "ID de configuration",
+          "description": "Valeur pour id de configuration."
+        },
+        "date": {
+          "name": "Date",
+          "description": "Valeur pour date."
+        }
+      }
+    },
+    "get_symptom": {
+      "name": "Consulter un symptôme",
+      "description": "Service pour consulter un symptôme.",
+      "fields": {
+        "entity_id": {
+          "name": "Entité",
+          "description": "Valeur pour entité."
+        },
+        "profile": {
+          "name": "Profil",
+          "description": "Valeur pour profil."
+        },
+        "entry_id": {
+          "name": "ID de configuration",
+          "description": "Valeur pour id de configuration."
+        },
+        "date": {
+          "name": "Date",
+          "description": "Valeur pour date."
+        }
+      }
+    },
+    "set_pregnancy_mode": {
+      "name": "Définir le mode grossesse",
+      "description": "Service pour définir le mode grossesse.",
+      "fields": {
+        "entity_id": {
+          "name": "Entité",
+          "description": "Valeur pour entité."
+        },
+        "profile": {
+          "name": "Profil",
+          "description": "Valeur pour profil."
+        },
+        "entry_id": {
+          "name": "ID de configuration",
+          "description": "Valeur pour id de configuration."
+        },
+        "is_pregnant": {
+          "name": "Enceinte",
+          "description": "Valeur pour enceinte."
+        },
+        "pregnancy_start_date": {
+          "name": "Début de la grossesse",
+          "description": "Valeur pour début de la grossesse."
+        }
+      }
+    },
+    "update_pregnancy_date": {
+      "name": "Modifier la date de grossesse",
+      "description": "Service pour modifier la date de grossesse.",
+      "fields": {
+        "entity_id": {
+          "name": "Entité",
+          "description": "Valeur pour entité."
+        },
+        "profile": {
+          "name": "Profil",
+          "description": "Valeur pour profil."
+        },
+        "entry_id": {
+          "name": "ID de configuration",
+          "description": "Valeur pour id de configuration."
+        },
+        "pregnancy_start_date": {
+          "name": "Début de la grossesse",
+          "description": "Valeur pour début de la grossesse."
+        }
+      }
+    },
+    "set_menarche_mode": {
+      "name": "Définir le mode ménarche",
+      "description": "Service pour définir le mode ménarche.",
+      "fields": {
+        "entity_id": {
+          "name": "Entité",
+          "description": "Valeur pour entité."
+        },
+        "profile": {
+          "name": "Profil",
+          "description": "Valeur pour profil."
+        },
+        "entry_id": {
+          "name": "ID de configuration",
+          "description": "Valeur pour id de configuration."
+        },
+        "is_menarche": {
+          "name": "Is Menarche",
+          "description": "Valeur pour is menarche."
+        },
+        "estimated_menarche_date": {
+          "name": "Date estimée de la ménarche",
+          "description": "Valeur pour date estimée de la ménarche."
+        },
+        "family_menarche_age": {
+          "name": "Âge de la ménarche dans la famille",
+          "description": "Valeur pour âge de la ménarche dans la famille."
+        }
+      }
+    },
+    "update_menarche_date": {
+      "name": "Modifier la date de ménarche",
+      "description": "Service pour modifier la date de ménarche.",
+      "fields": {
+        "entity_id": {
+          "name": "Entité",
+          "description": "Valeur pour entité."
+        },
+        "profile": {
+          "name": "Profil",
+          "description": "Valeur pour profil."
+        },
+        "entry_id": {
+          "name": "ID de configuration",
+          "description": "Valeur pour id de configuration."
+        },
+        "date": {
+          "name": "Date",
+          "description": "Valeur pour date."
+        }
+      }
+    },
+    "log_first_period": {
+      "name": "Enregistrer les premières règles",
+      "description": "Service pour enregistrer les premières règles.",
+      "fields": {
+        "entity_id": {
+          "name": "Entité",
+          "description": "Valeur pour entité."
+        },
+        "profile": {
+          "name": "Profil",
+          "description": "Valeur pour profil."
+        },
+        "entry_id": {
+          "name": "ID de configuration",
+          "description": "Valeur pour id de configuration."
+        },
+        "date": {
+          "name": "Date",
+          "description": "Valeur pour date."
+        }
+      }
+    },
+    "get_menarche_info": {
+      "name": "Consulter les informations de ménarche",
+      "description": "Service pour consulter les informations de ménarche.",
+      "fields": {
+        "entity_id": {
+          "name": "Entité",
+          "description": "Valeur pour entité."
+        },
+        "profile": {
+          "name": "Profil",
+          "description": "Valeur pour profil."
+        },
+        "entry_id": {
+          "name": "ID de configuration",
+          "description": "Valeur pour id de configuration."
+        }
+      }
+    },
+    "add_pre_menarche_sign": {
+      "name": "Ajouter un signe pré-ménarche",
+      "description": "Service pour ajouter un signe pré-ménarche.",
+      "fields": {
+        "entity_id": {
+          "name": "Entité",
+          "description": "Valeur pour entité."
+        },
+        "profile": {
+          "name": "Profil",
+          "description": "Valeur pour profil."
+        },
+        "entry_id": {
+          "name": "ID de configuration",
+          "description": "Valeur pour id de configuration."
+        },
+        "pre_menarche_sign": {
+          "name": "Signe pré-ménarche",
+          "description": "Valeur pour signe pré-ménarche."
+        },
+        "tanner_stage": {
+          "name": "Stade de Tanner",
+          "description": "Valeur pour stade de tanner."
+        }
+      }
+    },
+    "remove_pre_menarche_sign": {
+      "name": "Supprimer un signe pré-ménarche",
+      "description": "Service pour supprimer un signe pré-ménarche.",
+      "fields": {
+        "entity_id": {
+          "name": "Entité",
+          "description": "Valeur pour entité."
+        },
+        "profile": {
+          "name": "Profil",
+          "description": "Valeur pour profil."
+        },
+        "entry_id": {
+          "name": "ID de configuration",
+          "description": "Valeur pour id de configuration."
+        },
+        "pre_menarche_sign": {
+          "name": "Signe pré-ménarche",
+          "description": "Valeur pour signe pré-ménarche."
+        }
+      }
+    },
+    "set_menopause_mode": {
+      "name": "Définir le mode ménopause",
+      "description": "Service pour définir le mode ménopause.",
+      "fields": {
+        "entity_id": {
+          "name": "Entité",
+          "description": "Valeur pour entité."
+        },
+        "profile": {
+          "name": "Profil",
+          "description": "Valeur pour profil."
+        },
+        "entry_id": {
+          "name": "ID de configuration",
+          "description": "Valeur pour id de configuration."
+        },
+        "is_menopause": {
+          "name": "Ménopause",
+          "description": "Valeur pour ménopause."
+        },
+        "menopause_start_date": {
+          "name": "Début de la ménopause",
+          "description": "Valeur pour début de la ménopause."
+        }
+      }
+    },
+    "update_menopause_date": {
+      "name": "Modifier la date de ménopause",
+      "description": "Service pour modifier la date de ménopause.",
+      "fields": {
+        "entity_id": {
+          "name": "Entité",
+          "description": "Valeur pour entité."
+        },
+        "profile": {
+          "name": "Profil",
+          "description": "Valeur pour profil."
+        },
+        "entry_id": {
+          "name": "ID de configuration",
+          "description": "Valeur pour id de configuration."
+        },
+        "menopause_start_date": {
+          "name": "Début de la ménopause",
+          "description": "Valeur pour début de la ménopause."
+        }
+      }
+    },
+    "save_timer_state": {
+      "name": "Enregistrer l’état du minuteur",
+      "description": "Service pour enregistrer l’état du minuteur.",
+      "fields": {
+        "entity_id": {
+          "name": "Entité",
+          "description": "Valeur pour entité."
+        },
+        "profile": {
+          "name": "Profil",
+          "description": "Valeur pour profil."
+        },
+        "entry_id": {
+          "name": "ID de configuration",
+          "description": "Valeur pour id de configuration."
+        },
+        "remaining_seconds": {
+          "name": "Secondes restantes",
+          "description": "Valeur pour secondes restantes."
+        },
+        "total_seconds": {
+          "name": "Secondes totales",
+          "description": "Valeur pour secondes totales."
+        },
+        "selected_product": {
+          "name": "Produit sélectionné",
+          "description": "Valeur pour produit sélectionné."
+        },
+        "is_running": {
+          "name": "En cours",
+          "description": "Valeur pour en cours."
+        },
+        "saved_at": {
+          "name": "Enregistré le",
+          "description": "Valeur pour enregistré le."
+        }
+      }
+    },
+    "export_doctor_report": {
+      "name": "Exporter le rapport médical",
+      "description": "Service pour exporter le rapport médical.",
+      "fields": {
+        "entity_id": {
+          "name": "Entité",
+          "description": "Valeur pour entité."
+        },
+        "profile": {
+          "name": "Profil",
+          "description": "Valeur pour profil."
+        },
+        "entry_id": {
+          "name": "ID de configuration",
+          "description": "Valeur pour id de configuration."
+        },
+        "days_back": {
+          "name": "Jours précédents",
+          "description": "Valeur pour jours précédents."
+        },
+        "patient_name": {
+          "name": "Nom de la personne",
+          "description": "Valeur pour nom de la personne."
+        },
+        "patient_birthdate": {
+          "name": "Date de naissance",
+          "description": "Valeur pour date de naissance."
+        },
+        "language": {
+          "name": "Langue",
+          "description": "Valeur pour langue."
         }
       }
     }

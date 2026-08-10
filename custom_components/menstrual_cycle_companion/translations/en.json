@@ -32,7 +32,8 @@
           "menopause_enabled": "Enable menopause mode",
           "menopause_start_date": "Menopause start date (YYYY-MM-DD)",
           "cycle_length_override": "Cycle length override (days, 0 = auto)",
-          "nfp_analysis_mode": "NFP analysis mode"
+          "nfp_analysis_mode": "NFP analysis mode",
+          "num_predictions": "Number of future cycle predictions"
         },
         "data_description": {
           "period_duration_days": "Number of days the period typically lasts (1–14).",
@@ -44,7 +45,8 @@
           "menopause_enabled": "Activates menopause tracking mode.",
           "menopause_start_date": "Date when menopause started (YYYY-MM-DD). Leave empty if unknown.",
           "cycle_length_override": "Override the automatically calculated average cycle length. Set to 0 to use the auto-calculated value from your history (recommended). Set to 20–38 to manually fix the cycle length used for fertile window and ovulation calculations.",
-          "nfp_analysis_mode": "Controls how ovulation and the fertile window are calculated. 'hybrid' (default) learns from observed temperature data and falls back to the statistical formula. 'strict' only shows ovulation and the fertile window when a temperature rise is confirmed in the current cycle."
+          "nfp_analysis_mode": "Controls how ovulation and the fertile window are calculated. 'hybrid' (default) learns from observed temperature data and falls back to the statistical formula. 'strict' only shows ovulation and the fertile window when a temperature rise is confirmed in the current cycle.",
+          "num_predictions": "How many future cycle starts to generate (1-12). Default is 6."
         }
       }
     },
@@ -54,6 +56,186 @@
     }
   },
   "services": {
+    "add_cycle_start": {
+      "name": "Add cycle start day",
+      "description": "Add one confirmed bleeding day in YYYY-MM-DD format.",
+      "fields": {
+        "entity_id": {
+          "name": "Entity Id",
+          "description": "Value for entity id."
+        },
+        "profile": {
+          "name": "Profile",
+          "description": "Value for profile."
+        },
+        "entry_id": {
+          "name": "Entry Id",
+          "description": "Value for entry id."
+        },
+        "date": {
+          "name": "Date",
+          "description": "Value for date."
+        }
+      }
+    },
+    "remove_cycle_start": {
+      "name": "Remove cycle start day",
+      "description": "Remove one confirmed bleeding day in YYYY-MM-DD format.",
+      "fields": {
+        "entity_id": {
+          "name": "Entity Id",
+          "description": "Value for entity id."
+        },
+        "profile": {
+          "name": "Profile",
+          "description": "Value for profile."
+        },
+        "entry_id": {
+          "name": "Entry Id",
+          "description": "Value for entry id."
+        },
+        "date": {
+          "name": "Date",
+          "description": "Value for date."
+        }
+      }
+    },
+    "set_cycle_range": {
+      "name": "Set cycle date range",
+      "description": "Add every confirmed bleeding day from start_date through end_date, inclusive.",
+      "fields": {
+        "entity_id": {
+          "name": "Entity Id",
+          "description": "Value for entity id."
+        },
+        "profile": {
+          "name": "Profile",
+          "description": "Value for profile."
+        },
+        "entry_id": {
+          "name": "Entry Id",
+          "description": "Value for entry id."
+        },
+        "start_date": {
+          "name": "Start Date",
+          "description": "Value for start date."
+        },
+        "end_date": {
+          "name": "End Date",
+          "description": "Value for end date."
+        }
+      }
+    },
+    "set_cycle_history": {
+      "name": "Replace full cycle history",
+      "description": "Replace complete confirmed bleeding history with a list of dates.",
+      "fields": {
+        "entity_id": {
+          "name": "Entity Id",
+          "description": "Value for entity id."
+        },
+        "profile": {
+          "name": "Profile",
+          "description": "Value for profile."
+        },
+        "entry_id": {
+          "name": "Entry Id",
+          "description": "Value for entry id."
+        },
+        "dates": {
+          "name": "Dates",
+          "description": "Value for dates."
+        }
+      }
+    },
+    "set_period_duration": {
+      "name": "Set period duration days",
+      "description": "Set forecasted period duration (used for card markers).",
+      "fields": {
+        "entity_id": {
+          "name": "Entity Id",
+          "description": "Value for entity id."
+        },
+        "profile": {
+          "name": "Profile",
+          "description": "Value for profile."
+        },
+        "entry_id": {
+          "name": "Entry Id",
+          "description": "Value for entry id."
+        },
+        "days": {
+          "name": "Days",
+          "description": "Value for days."
+        }
+      }
+    },
+    "erase_all_history": {
+      "name": "Erase all cycle history",
+      "description": "Destructive action. Deletes the complete stored history.\nSafety checks:\n- works only when `erase_all` is exactly `true`\n- requires explicit `entity_id` (sensor id)\nThis helps prevent accidental destructive calls (e.g. shell command without target).\n",
+      "fields": {
+        "entity_id": {
+          "name": "Entity Id",
+          "description": "Value for entity id."
+        },
+        "profile": {
+          "name": "Profile",
+          "description": "Value for profile."
+        },
+        "entry_id": {
+          "name": "Entry Id",
+          "description": "Value for entry id."
+        },
+        "erase_all": {
+          "name": "Erase All",
+          "description": "Value for erase all."
+        }
+      }
+    },
+    "export_history": {
+      "name": "Export cycle history",
+      "description": "Exports the current history to a local file.\nFiles are written to `<config>/menstrual_cycle_companion_exports/`.\nSupported formats: `csv`, `txt`.\n",
+      "fields": {
+        "entity_id": {
+          "name": "Entity Id",
+          "description": "Value for entity id."
+        },
+        "profile": {
+          "name": "Profile",
+          "description": "Value for profile."
+        },
+        "entry_id": {
+          "name": "Entry Id",
+          "description": "Value for entry id."
+        },
+        "format": {
+          "name": "Format",
+          "description": "Value for format."
+        },
+        "filename": {
+          "name": "Filename",
+          "description": "Value for filename."
+        }
+      }
+    },
+    "refresh_cycle_model": {
+      "name": "Refresh cycle model",
+      "description": "Recalculate all date-based sensor values, including days until next predicted start.",
+      "fields": {
+        "entity_id": {
+          "name": "Entity Id",
+          "description": "Value for entity id."
+        },
+        "profile": {
+          "name": "Profile",
+          "description": "Value for profile."
+        },
+        "entry_id": {
+          "name": "Entry Id",
+          "description": "Value for entry id."
+        }
+      }
+    },
     "log_product_usage": {
       "name": "Log product usage",
       "description": "Log period-product usage for timer integrations and long-term statistics.",
@@ -85,6 +267,418 @@
         "date": {
           "name": "Date",
           "description": "Optional ISO date to backfill. Defaults to today."
+        }
+      }
+    },
+    "manage_household_inventory": {
+      "name": "Manage household inventory",
+      "description": "Manage shared household stock for tampons, pads, cups, liners, and period underwear.",
+      "fields": {
+        "inventory_action": {
+          "name": "Inventory Action",
+          "description": "Value for inventory action."
+        },
+        "product": {
+          "name": "Product",
+          "description": "Value for product."
+        },
+        "quantity": {
+          "name": "Quantity",
+          "description": "Value for quantity."
+        },
+        "warning_threshold": {
+          "name": "Warning Threshold",
+          "description": "Value for warning threshold."
+        },
+        "critical_threshold": {
+          "name": "Critical Threshold",
+          "description": "Value for critical threshold."
+        },
+        "member": {
+          "name": "Member",
+          "description": "Name of the household member for manual consumption logs."
+        },
+        "underwear_total_owned": {
+          "name": "Underwear Total Owned",
+          "description": "Total number of period underwear pieces owned (used to calculate availability and washing alerts)."
+        }
+      }
+    },
+    "add_symptom": {
+      "name": "Add or update symptom data for a date",
+      "description": "Add or update symptom data for a specific date. Data is merged with existing entries.",
+      "fields": {
+        "entity_id": {
+          "name": "Entity Id",
+          "description": "Value for entity id."
+        },
+        "profile": {
+          "name": "Profile",
+          "description": "Value for profile."
+        },
+        "entry_id": {
+          "name": "Entry Id",
+          "description": "Value for entry id."
+        },
+        "date": {
+          "name": "Date",
+          "description": "Date in YYYY-MM-DD format"
+        },
+        "symptom_data": {
+          "name": "Symptom Data",
+          "description": "Dictionary with symptom fields. Optional fields - bleeding_strength, spotting, intercourse, pain (list), basal_temp (number), hygiene (list), test"
+        }
+      }
+    },
+    "remove_symptom": {
+      "name": "Remove symptom data for a date",
+      "description": "Remove all symptom data for a specific date.",
+      "fields": {
+        "entity_id": {
+          "name": "Entity Id",
+          "description": "Value for entity id."
+        },
+        "profile": {
+          "name": "Profile",
+          "description": "Value for profile."
+        },
+        "entry_id": {
+          "name": "Entry Id",
+          "description": "Value for entry id."
+        },
+        "date": {
+          "name": "Date",
+          "description": "Date in YYYY-MM-DD format"
+        }
+      }
+    },
+    "get_symptom": {
+      "name": "Get symptom data for a date",
+      "description": "Retrieve symptom data for a specific date.",
+      "fields": {
+        "entity_id": {
+          "name": "Entity Id",
+          "description": "Value for entity id."
+        },
+        "profile": {
+          "name": "Profile",
+          "description": "Value for profile."
+        },
+        "entry_id": {
+          "name": "Entry Id",
+          "description": "Value for entry id."
+        },
+        "date": {
+          "name": "Date",
+          "description": "Date in YYYY-MM-DD format"
+        }
+      }
+    },
+    "set_pregnancy_mode": {
+      "name": "Set pregnancy mode",
+      "description": "Enable or disable pregnancy mode. When enabled, the sensor reports pregnancy state with weeks pregnant and due date.",
+      "fields": {
+        "entity_id": {
+          "name": "Entity Id",
+          "description": "Value for entity id."
+        },
+        "profile": {
+          "name": "Profile",
+          "description": "Value for profile."
+        },
+        "entry_id": {
+          "name": "Entry Id",
+          "description": "Value for entry id."
+        },
+        "is_pregnant": {
+          "name": "Is Pregnant",
+          "description": "Set to true to enable pregnancy mode, false to disable."
+        },
+        "pregnancy_start_date": {
+          "name": "Pregnancy Start Date",
+          "description": "First day of last menstrual period (YYYY-MM-DD). Defaults to last known period start."
+        }
+      }
+    },
+    "update_pregnancy_date": {
+      "name": "Update pregnancy start date",
+      "description": "Update the first day of the last menstrual period used for pregnancy calculations.",
+      "fields": {
+        "entity_id": {
+          "name": "Entity Id",
+          "description": "Value for entity id."
+        },
+        "profile": {
+          "name": "Profile",
+          "description": "Value for profile."
+        },
+        "entry_id": {
+          "name": "Entry Id",
+          "description": "Value for entry id."
+        },
+        "pregnancy_start_date": {
+          "name": "Pregnancy Start Date",
+          "description": "First day of last menstrual period in YYYY-MM-DD format."
+        }
+      }
+    },
+    "set_menarche_mode": {
+      "name": "Set menarche mode",
+      "description": "Enable pre-menarche tracking or confirm that menarche has occurred. Use this for tracking puberty signs before the first period.",
+      "fields": {
+        "entity_id": {
+          "name": "Entity Id",
+          "description": "Value for entity id."
+        },
+        "profile": {
+          "name": "Profile",
+          "description": "Value for profile."
+        },
+        "entry_id": {
+          "name": "Entry Id",
+          "description": "Value for entry id."
+        },
+        "is_menarche": {
+          "name": "Is Menarche",
+          "description": "Set to false to enable pre-menarche tracking, true when menarche has occurred."
+        },
+        "estimated_menarche_date": {
+          "name": "Estimated Menarche Date",
+          "description": "Estimated date when menarche is expected (YYYY-MM-DD)."
+        },
+        "family_menarche_age": {
+          "name": "Family Menarche Age",
+          "description": "Age of menarche in the family (e.g. mother, sister), used for estimation."
+        }
+      }
+    },
+    "update_menarche_date": {
+      "name": "Update menarche date",
+      "description": "Record the actual date when menarche (first period) occurred.",
+      "fields": {
+        "entity_id": {
+          "name": "Entity Id",
+          "description": "Value for entity id."
+        },
+        "profile": {
+          "name": "Profile",
+          "description": "Value for profile."
+        },
+        "entry_id": {
+          "name": "Entry Id",
+          "description": "Value for entry id."
+        },
+        "date": {
+          "name": "Date",
+          "description": "Date when menarche occurred (YYYY-MM-DD)."
+        }
+      }
+    },
+    "log_first_period": {
+      "name": "Log first period",
+      "description": "Atomically records menarche date and adds the first cycle start. Use this to transition a profile out of Pre-Menarche mode when the first period begins.",
+      "fields": {
+        "entity_id": {
+          "name": "Entity Id",
+          "description": "Value for entity id."
+        },
+        "profile": {
+          "name": "Profile",
+          "description": "Value for profile."
+        },
+        "entry_id": {
+          "name": "Entry Id",
+          "description": "Value for entry id."
+        },
+        "date": {
+          "name": "Date",
+          "description": "Date of the first period (YYYY-MM-DD)."
+        }
+      }
+    },
+    "get_menarche_info": {
+      "name": "Get menarche information",
+      "description": "Retrieve menarche and pre-menarche tracking data for a profile.",
+      "fields": {
+        "entity_id": {
+          "name": "Entity Id",
+          "description": "Value for entity id."
+        },
+        "profile": {
+          "name": "Profile",
+          "description": "Value for profile."
+        },
+        "entry_id": {
+          "name": "Entry Id",
+          "description": "Value for entry id."
+        }
+      }
+    },
+    "add_pre_menarche_sign": {
+      "name": "Add pre-menarche body sign",
+      "description": "Record or update a puberty body sign for pre-menarche tracking (Tanner stage classification).",
+      "fields": {
+        "entity_id": {
+          "name": "Entity Id",
+          "description": "Value for entity id."
+        },
+        "profile": {
+          "name": "Profile",
+          "description": "Value for profile."
+        },
+        "entry_id": {
+          "name": "Entry Id",
+          "description": "Value for entry id."
+        },
+        "pre_menarche_sign": {
+          "name": "Pre Menarche Sign",
+          "description": "The puberty sign to record."
+        },
+        "tanner_stage": {
+          "name": "Tanner Stage",
+          "description": "Current stage or level for the selected sign."
+        }
+      }
+    },
+    "remove_pre_menarche_sign": {
+      "name": "Remove pre-menarche body sign",
+      "description": "Remove a recorded puberty body sign from pre-menarche tracking.",
+      "fields": {
+        "entity_id": {
+          "name": "Entity Id",
+          "description": "Value for entity id."
+        },
+        "profile": {
+          "name": "Profile",
+          "description": "Value for profile."
+        },
+        "entry_id": {
+          "name": "Entry Id",
+          "description": "Value for entry id."
+        },
+        "pre_menarche_sign": {
+          "name": "Pre Menarche Sign",
+          "description": "The puberty sign to remove."
+        }
+      }
+    },
+    "set_menopause_mode": {
+      "name": "Set menopause mode",
+      "description": "Enable or disable menopause tracking mode.",
+      "fields": {
+        "entity_id": {
+          "name": "Entity Id",
+          "description": "Value for entity id."
+        },
+        "profile": {
+          "name": "Profile",
+          "description": "Value for profile."
+        },
+        "entry_id": {
+          "name": "Entry Id",
+          "description": "Value for entry id."
+        },
+        "is_menopause": {
+          "name": "Is Menopause",
+          "description": "Set to true to activate menopause mode, false to deactivate."
+        },
+        "menopause_start_date": {
+          "name": "Menopause Start Date",
+          "description": "Date when menopause started (YYYY-MM-DD). Optional."
+        }
+      }
+    },
+    "update_menopause_date": {
+      "name": "Update menopause date",
+      "description": "Update the menopause start date.",
+      "fields": {
+        "entity_id": {
+          "name": "Entity Id",
+          "description": "Value for entity id."
+        },
+        "profile": {
+          "name": "Profile",
+          "description": "Value for profile."
+        },
+        "entry_id": {
+          "name": "Entry Id",
+          "description": "Value for entry id."
+        },
+        "menopause_start_date": {
+          "name": "Menopause Start Date",
+          "description": "Date when menopause started (YYYY-MM-DD)."
+        }
+      }
+    },
+    "save_timer_state": {
+      "name": "Save timer state",
+      "description": "Persist the current countdown timer state (remaining time, selected product,\nrunning/paused) so it survives page reloads and is available on other devices.\nCalled automatically by the Period Countdown Timer card.\n",
+      "fields": {
+        "entity_id": {
+          "name": "Entity Id",
+          "description": "Value for entity id."
+        },
+        "profile": {
+          "name": "Profile",
+          "description": "Value for profile."
+        },
+        "entry_id": {
+          "name": "Entry Id",
+          "description": "Value for entry id."
+        },
+        "remaining_seconds": {
+          "name": "Remaining Seconds",
+          "description": "Remaining countdown seconds at the time of saving."
+        },
+        "total_seconds": {
+          "name": "Total Seconds",
+          "description": "Total countdown duration in seconds for the selected product."
+        },
+        "selected_product": {
+          "name": "Selected Product",
+          "description": "Currently selected product key (tampon, pad, cup, liner, underwear)."
+        },
+        "is_running": {
+          "name": "Is Running",
+          "description": "Whether the timer was actively running when the state was saved."
+        },
+        "saved_at": {
+          "name": "Saved At",
+          "description": "JavaScript Date.now() millisecond timestamp when the state was saved. Used to calculate elapsed time when restoring a running timer.\n"
+        }
+      }
+    },
+    "export_doctor_report": {
+      "name": "Export doctor report (HTML)",
+      "description": "Generates a professional HTML medical report from the cycle history and symptom data.\nThe file is saved to `<config>/menstrual_cycle_companion_exports/`.\nOpen the file in a browser and use \"Print to PDF\" to create a PDF.\n",
+      "fields": {
+        "entity_id": {
+          "name": "Entity Id",
+          "description": "Value for entity id."
+        },
+        "profile": {
+          "name": "Profile",
+          "description": "Value for profile."
+        },
+        "entry_id": {
+          "name": "Entry Id",
+          "description": "Value for entry id."
+        },
+        "days_back": {
+          "name": "Days Back",
+          "description": "Number of days to include in the report (30–730). Default is 180 (6 months)."
+        },
+        "patient_name": {
+          "name": "Patient Name",
+          "description": "Patient name to include in the report header (optional)."
+        },
+        "patient_birthdate": {
+          "name": "Patient Birthdate",
+          "description": "Patient date of birth in YYYY-MM-DD format (optional)."
+        },
+        "language": {
+          "name": "Language",
+          "description": "Report language. \"de\" for German, \"en\" for English. Default is \"de\"."
         }
       }
     }

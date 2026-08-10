@@ -32,7 +32,8 @@
           "menopause_enabled": "Menopause-Modus aktivieren",
           "menopause_start_date": "Menopause-Startdatum (JJJJ-MM-TT)",
           "cycle_length_override": "Zyklus-Länge überschreiben (Tage, 0 = automatisch)",
-          "nfp_analysis_mode": "NFP-Analysemodus"
+          "nfp_analysis_mode": "NFP-Analysemodus",
+          "num_predictions": "Anzahl zukuenftiger Zyklusvorhersagen"
         },
         "data_description": {
           "period_duration_days": "Typische Anzahl der Periodentage (1–14).",
@@ -44,7 +45,8 @@
           "menopause_enabled": "Aktiviert den Menopause-Tracking-Modus.",
           "menopause_start_date": "Datum des Menopause-Beginns (JJJJ-MM-TT). Leer lassen, falls unbekannt.",
           "cycle_length_override": "Überschreibt die automatisch berechnete durchschnittliche Zykluslänge. 0 = automatisch aus dem Verlauf berechnen (empfohlen). 20–38 = feste Zykluslänge für Fruchtbarkeitsfenster und Eisprung-Berechnungen.",
-          "nfp_analysis_mode": "Legt fest, wie Eisprung und Fruchtbarkeitsfenster berechnet werden. 'hybrid' (Standard) lernt aus Temperaturmessungen und verwendet die statistische Formel als Fallback. 'strict' zeigt Eisprung und Fruchtbarkeitsfenster nur an, wenn im aktuellen Zyklus ein Temperaturanstieg bestätigt wurde."
+          "nfp_analysis_mode": "Legt fest, wie Eisprung und Fruchtbarkeitsfenster berechnet werden. 'hybrid' (Standard) lernt aus Temperaturmessungen und verwendet die statistische Formel als Fallback. 'strict' zeigt Eisprung und Fruchtbarkeitsfenster nur an, wenn im aktuellen Zyklus ein Temperaturanstieg bestätigt wurde.",
+          "num_predictions": "Wie viele zukuenftige Zyklusstarts erzeugt werden (1-12). Standard: 6."
         }
       }
     },
@@ -70,273 +72,629 @@
     }
   },
   "services": {
-    "log_product_usage": {
-      "name": "Produktverbrauch protokollieren",
-      "description": "Protokolliert Periodenprodukt-Verbrauch für Timer-Integrationen und Langzeitstatistiken.",
+    "add_cycle_start": {
+      "name": "Zyklustag hinzufügen",
+      "description": "Dienst fuer zyklustag hinzufügen.",
       "fields": {
         "entity_id": {
           "name": "Entität",
-          "description": "Ziel-Menstruationssensor."
+          "description": "Wert für entität."
         },
         "profile": {
           "name": "Profil",
-          "description": "Konfigurierter Profil-Slug."
+          "description": "Wert für profil."
         },
         "entry_id": {
-          "name": "Entry-ID",
-          "description": "Kennung des Config-Entries."
-        },
-        "product": {
-          "name": "Produkt",
-          "description": "Zu protokollierender Produkttyp."
-        },
-        "action": {
-          "name": "Aktion",
-          "description": "Verbrauchsaktion, zum Beispiel benutzt oder geleert."
-        },
-        "quantity": {
-          "name": "Menge",
-          "description": "Wie viele Produkte oder Leerungen hinzugefügt werden."
+          "name": "Eintrags-ID",
+          "description": "Wert für eintrags-id."
         },
         "date": {
           "name": "Datum",
-          "description": "Optionales ISO-Datum für Nachträge. Standard ist heute."
+          "description": "Wert für datum."
+        }
+      }
+    },
+    "remove_cycle_start": {
+      "name": "Zyklustag entfernen",
+      "description": "Dienst fuer zyklustag entfernen.",
+      "fields": {
+        "entity_id": {
+          "name": "Entität",
+          "description": "Wert für entität."
+        },
+        "profile": {
+          "name": "Profil",
+          "description": "Wert für profil."
+        },
+        "entry_id": {
+          "name": "Eintrags-ID",
+          "description": "Wert für eintrags-id."
+        },
+        "date": {
+          "name": "Datum",
+          "description": "Wert für datum."
+        }
+      }
+    },
+    "set_cycle_range": {
+      "name": "Zykluszeitraum festlegen",
+      "description": "Dienst fuer zykluszeitraum festlegen.",
+      "fields": {
+        "entity_id": {
+          "name": "Entität",
+          "description": "Wert für entität."
+        },
+        "profile": {
+          "name": "Profil",
+          "description": "Wert für profil."
+        },
+        "entry_id": {
+          "name": "Eintrags-ID",
+          "description": "Wert für eintrags-id."
+        },
+        "start_date": {
+          "name": "Startdatum",
+          "description": "Wert für startdatum."
+        },
+        "end_date": {
+          "name": "Enddatum",
+          "description": "Wert für enddatum."
+        }
+      }
+    },
+    "set_cycle_history": {
+      "name": "Zyklushistorie ersetzen",
+      "description": "Dienst fuer zyklushistorie ersetzen.",
+      "fields": {
+        "entity_id": {
+          "name": "Entität",
+          "description": "Wert für entität."
+        },
+        "profile": {
+          "name": "Profil",
+          "description": "Wert für profil."
+        },
+        "entry_id": {
+          "name": "Eintrags-ID",
+          "description": "Wert für eintrags-id."
+        },
+        "dates": {
+          "name": "Daten",
+          "description": "Wert für daten."
+        }
+      }
+    },
+    "set_period_duration": {
+      "name": "Periodendauer festlegen",
+      "description": "Dienst fuer periodendauer festlegen.",
+      "fields": {
+        "entity_id": {
+          "name": "Entität",
+          "description": "Wert für entität."
+        },
+        "profile": {
+          "name": "Profil",
+          "description": "Wert für profil."
+        },
+        "entry_id": {
+          "name": "Eintrags-ID",
+          "description": "Wert für eintrags-id."
+        },
+        "days": {
+          "name": "Tage",
+          "description": "Wert für tage."
+        }
+      }
+    },
+    "erase_all_history": {
+      "name": "Gesamte Zyklushistorie löschen",
+      "description": "Dienst fuer gesamte zyklushistorie löschen.",
+      "fields": {
+        "entity_id": {
+          "name": "Entität",
+          "description": "Wert für entität."
+        },
+        "profile": {
+          "name": "Profil",
+          "description": "Wert für profil."
+        },
+        "entry_id": {
+          "name": "Eintrags-ID",
+          "description": "Wert für eintrags-id."
+        },
+        "erase_all": {
+          "name": "Alles löschen",
+          "description": "Wert für alles löschen."
+        }
+      }
+    },
+    "export_history": {
+      "name": "Zyklushistorie exportieren",
+      "description": "Dienst fuer zyklushistorie exportieren.",
+      "fields": {
+        "entity_id": {
+          "name": "Entität",
+          "description": "Wert für entität."
+        },
+        "profile": {
+          "name": "Profil",
+          "description": "Wert für profil."
+        },
+        "entry_id": {
+          "name": "Eintrags-ID",
+          "description": "Wert für eintrags-id."
+        },
+        "format": {
+          "name": "Format",
+          "description": "Wert für format."
+        },
+        "filename": {
+          "name": "Dateiname",
+          "description": "Wert für dateiname."
+        }
+      }
+    },
+    "refresh_cycle_model": {
+      "name": "Zyklusmodell aktualisieren",
+      "description": "Dienst fuer zyklusmodell aktualisieren.",
+      "fields": {
+        "entity_id": {
+          "name": "Entität",
+          "description": "Wert für entität."
+        },
+        "profile": {
+          "name": "Profil",
+          "description": "Wert für profil."
+        },
+        "entry_id": {
+          "name": "Eintrags-ID",
+          "description": "Wert für eintrags-id."
+        }
+      }
+    },
+    "log_product_usage": {
+      "name": "Produktverwendung protokollieren",
+      "description": "Dienst fuer produktverwendung protokollieren.",
+      "fields": {
+        "entity_id": {
+          "name": "Entität",
+          "description": "Wert für entität."
+        },
+        "profile": {
+          "name": "Profil",
+          "description": "Wert für profil."
+        },
+        "entry_id": {
+          "name": "Eintrags-ID",
+          "description": "Wert für eintrags-id."
+        },
+        "product": {
+          "name": "Produkt",
+          "description": "Wert für produkt."
+        },
+        "action": {
+          "name": "Aktion",
+          "description": "Wert für aktion."
+        },
+        "quantity": {
+          "name": "Menge",
+          "description": "Wert für menge."
+        },
+        "date": {
+          "name": "Datum",
+          "description": "Wert für datum."
+        }
+      }
+    },
+    "manage_household_inventory": {
+      "name": "Haushaltsbestand verwalten",
+      "description": "Dienst fuer haushaltsbestand verwalten.",
+      "fields": {
+        "inventory_action": {
+          "name": "Bestandsaktion",
+          "description": "Wert für bestandsaktion."
+        },
+        "product": {
+          "name": "Produkt",
+          "description": "Wert für produkt."
+        },
+        "quantity": {
+          "name": "Menge",
+          "description": "Wert für menge."
+        },
+        "warning_threshold": {
+          "name": "Warnschwelle",
+          "description": "Wert für warnschwelle."
+        },
+        "critical_threshold": {
+          "name": "Kritische Schwelle",
+          "description": "Wert für kritische schwelle."
+        },
+        "member": {
+          "name": "Person",
+          "description": "Wert für person."
+        },
+        "underwear_total_owned": {
+          "name": "Underwear Total Owned",
+          "description": "Wert für underwear total owned."
         }
       }
     },
     "add_symptom": {
       "name": "Symptom hinzufügen",
-      "description": "Symptom-Daten für ein bestimmtes Datum hinzufügen oder aktualisieren.",
+      "description": "Dienst fuer symptom hinzufügen.",
       "fields": {
         "entity_id": {
           "name": "Entität",
-          "description": "Ziel-Menstruationssensor."
+          "description": "Wert für entität."
         },
         "profile": {
           "name": "Profil",
-          "description": "Konfigurierter Profil-Slug."
+          "description": "Wert für profil."
         },
         "entry_id": {
-          "name": "Entry-ID",
-          "description": "Kennung des Config-Entries."
+          "name": "Eintrags-ID",
+          "description": "Wert für eintrags-id."
         },
         "date": {
           "name": "Datum",
-          "description": "Datum im Format YYYY-MM-DD."
+          "description": "Wert für datum."
         },
         "symptom_data": {
-          "name": "Symptom-Daten",
-          "description": "Wörterbuch mit Symptomfeldern (z. B. bleeding_strength, pain, basal_temp)."
+          "name": "Symptomdaten",
+          "description": "Wert für symptomdaten."
         }
       }
     },
     "remove_symptom": {
       "name": "Symptom entfernen",
-      "description": "Alle Symptom-Daten für ein bestimmtes Datum entfernen.",
+      "description": "Dienst fuer symptom entfernen.",
       "fields": {
         "entity_id": {
           "name": "Entität",
-          "description": "Ziel-Menstruationssensor."
+          "description": "Wert für entität."
         },
         "profile": {
           "name": "Profil",
-          "description": "Konfigurierter Profil-Slug."
+          "description": "Wert für profil."
         },
         "entry_id": {
-          "name": "Entry-ID",
-          "description": "Kennung des Config-Entries."
+          "name": "Eintrags-ID",
+          "description": "Wert für eintrags-id."
         },
         "date": {
           "name": "Datum",
-          "description": "Datum im Format YYYY-MM-DD."
+          "description": "Wert für datum."
         }
       }
     },
     "get_symptom": {
       "name": "Symptom abrufen",
-      "description": "Symptom-Daten für ein bestimmtes Datum abrufen.",
+      "description": "Dienst fuer symptom abrufen.",
       "fields": {
         "entity_id": {
           "name": "Entität",
-          "description": "Ziel-Menstruationssensor."
+          "description": "Wert für entität."
         },
         "profile": {
           "name": "Profil",
-          "description": "Konfigurierter Profil-Slug."
+          "description": "Wert für profil."
         },
         "entry_id": {
-          "name": "Entry-ID",
-          "description": "Kennung des Config-Entries."
+          "name": "Eintrags-ID",
+          "description": "Wert für eintrags-id."
         },
         "date": {
           "name": "Datum",
-          "description": "Datum im Format YYYY-MM-DD."
+          "description": "Wert für datum."
         }
       }
     },
     "set_pregnancy_mode": {
-      "name": "Schwangerschaftsmodus setzen",
-      "description": "Schwangerschaftsmodus aktivieren oder deaktivieren.",
+      "name": "Schwangerschaftsmodus festlegen",
+      "description": "Dienst fuer schwangerschaftsmodus festlegen.",
       "fields": {
         "entity_id": {
           "name": "Entität",
-          "description": "Ziel-Menstruationssensor."
+          "description": "Wert für entität."
         },
         "profile": {
           "name": "Profil",
-          "description": "Konfigurierter Profil-Slug."
+          "description": "Wert für profil."
         },
         "entry_id": {
-          "name": "Entry-ID",
-          "description": "Kennung des Config-Entries."
+          "name": "Eintrags-ID",
+          "description": "Wert für eintrags-id."
         },
         "is_pregnant": {
           "name": "Schwanger",
-          "description": "Auf wahr setzen um Schwangerschaftsmodus zu aktivieren, falsch zum Deaktivieren."
+          "description": "Wert für schwanger."
         },
         "pregnancy_start_date": {
-          "name": "Erster Tag der letzten Periode",
-          "description": "Datum im Format YYYY-MM-DD. Standard ist der letzte bekannte Periodenstart."
+          "name": "Beginn der Schwangerschaft",
+          "description": "Wert für beginn der schwangerschaft."
         }
       }
     },
     "update_pregnancy_date": {
       "name": "Schwangerschaftsdatum aktualisieren",
-      "description": "Den ersten Tag der letzten Menstruation für die Schwangerschaftsberechnung aktualisieren.",
+      "description": "Dienst fuer schwangerschaftsdatum aktualisieren.",
       "fields": {
         "entity_id": {
           "name": "Entität",
-          "description": "Ziel-Menstruationssensor."
+          "description": "Wert für entität."
         },
         "profile": {
           "name": "Profil",
-          "description": "Konfigurierter Profil-Slug."
+          "description": "Wert für profil."
         },
         "entry_id": {
-          "name": "Entry-ID",
-          "description": "Kennung des Config-Entries."
+          "name": "Eintrags-ID",
+          "description": "Wert für eintrags-id."
         },
         "pregnancy_start_date": {
-          "name": "Erster Tag der letzten Periode",
-          "description": "Datum im Format YYYY-MM-DD."
+          "name": "Beginn der Schwangerschaft",
+          "description": "Wert für beginn der schwangerschaft."
         }
       }
     },
     "set_menarche_mode": {
-      "name": "Menarche-Modus setzen",
-      "description": "Prä-Menarche-Tracking aktivieren oder bestätigen, dass die Menarche eingetreten ist.",
+      "name": "Menarche-Modus festlegen",
+      "description": "Dienst fuer menarche-modus festlegen.",
       "fields": {
         "entity_id": {
           "name": "Entität",
-          "description": "Ziel-Menstruationssensor."
+          "description": "Wert für entität."
         },
         "profile": {
           "name": "Profil",
-          "description": "Konfigurierter Profil-Slug."
+          "description": "Wert für profil."
         },
         "entry_id": {
-          "name": "Entry-ID",
-          "description": "Kennung des Config-Entries."
+          "name": "Eintrags-ID",
+          "description": "Wert für eintrags-id."
         },
         "is_menarche": {
-          "name": "Menarche eingetreten",
-          "description": "Auf falsch setzen für Prä-Menarche-Tracking, wahr wenn Menarche stattgefunden hat."
+          "name": "Is Menarche",
+          "description": "Wert für is menarche."
         },
         "estimated_menarche_date": {
           "name": "Geschätztes Menarche-Datum",
-          "description": "Voraussichtliches Datum der ersten Periode (YYYY-MM-DD)."
+          "description": "Wert für geschätztes menarche-datum."
         },
         "family_menarche_age": {
-          "name": "Menarche-Alter in der Familie",
-          "description": "Alter der Menarche bei Mutter oder Schwester, zur Schätzung."
+          "name": "Menarchealter in der Familie",
+          "description": "Wert für menarchealter in der familie."
         }
       }
     },
     "update_menarche_date": {
       "name": "Menarche-Datum aktualisieren",
-      "description": "Das tatsächliche Datum der ersten Periode (Menarche) erfassen.",
+      "description": "Dienst fuer menarche-datum aktualisieren.",
       "fields": {
         "entity_id": {
           "name": "Entität",
-          "description": "Ziel-Menstruationssensor."
+          "description": "Wert für entität."
         },
         "profile": {
           "name": "Profil",
-          "description": "Konfigurierter Profil-Slug."
+          "description": "Wert für profil."
         },
         "entry_id": {
-          "name": "Entry-ID",
-          "description": "Kennung des Config-Entries."
+          "name": "Eintrags-ID",
+          "description": "Wert für eintrags-id."
         },
         "date": {
-          "name": "Menarche-Datum",
-          "description": "Datum der ersten Periode im Format YYYY-MM-DD."
+          "name": "Datum",
+          "description": "Wert für datum."
+        }
+      }
+    },
+    "log_first_period": {
+      "name": "Erste Periode protokollieren",
+      "description": "Dienst fuer erste periode protokollieren.",
+      "fields": {
+        "entity_id": {
+          "name": "Entität",
+          "description": "Wert für entität."
+        },
+        "profile": {
+          "name": "Profil",
+          "description": "Wert für profil."
+        },
+        "entry_id": {
+          "name": "Eintrags-ID",
+          "description": "Wert für eintrags-id."
+        },
+        "date": {
+          "name": "Datum",
+          "description": "Wert für datum."
         }
       }
     },
     "get_menarche_info": {
       "name": "Menarche-Informationen abrufen",
-      "description": "Menarche- und Prä-Menarche-Tracking-Daten für ein Profil abrufen.",
+      "description": "Dienst fuer menarche-informationen abrufen.",
       "fields": {
         "entity_id": {
           "name": "Entität",
-          "description": "Ziel-Menstruationssensor."
+          "description": "Wert für entität."
         },
         "profile": {
           "name": "Profil",
-          "description": "Konfigurierter Profil-Slug."
+          "description": "Wert für profil."
         },
         "entry_id": {
-          "name": "Entry-ID",
-          "description": "Kennung des Config-Entries."
+          "name": "Eintrags-ID",
+          "description": "Wert für eintrags-id."
         }
       }
     },
     "add_pre_menarche_sign": {
-      "name": "Pubertätszeichen hinzufügen",
-      "description": "Ein körperliches Pubertätszeichen für das Prä-Menarche-Tracking erfassen oder aktualisieren.",
+      "name": "Zeichen vor der Menarche hinzufügen",
+      "description": "Dienst fuer zeichen vor der menarche hinzufügen.",
       "fields": {
         "entity_id": {
           "name": "Entität",
-          "description": "Ziel-Menstruationssensor."
+          "description": "Wert für entität."
         },
         "profile": {
           "name": "Profil",
-          "description": "Konfigurierter Profil-Slug."
+          "description": "Wert für profil."
         },
         "entry_id": {
-          "name": "Entry-ID",
-          "description": "Kennung des Config-Entries."
+          "name": "Eintrags-ID",
+          "description": "Wert für eintrags-id."
         },
         "pre_menarche_sign": {
-          "name": "Pubertätszeichen",
-          "description": "Das zu erfassende Körperzeichen (z. B. breast_development, pubic_hair_growth)."
+          "name": "Zeichen vor der Menarche",
+          "description": "Wert für zeichen vor der menarche."
         },
         "tanner_stage": {
-          "name": "Tanner-Stadium",
-          "description": "Aktuelles Stadium oder Level für das gewählte Zeichen."
+          "name": "Tanner-Stufe",
+          "description": "Wert für tanner-stufe."
         }
       }
     },
     "remove_pre_menarche_sign": {
-      "name": "Pubertätszeichen entfernen",
-      "description": "Ein erfasstes Pubertätszeichen aus dem Prä-Menarche-Tracking entfernen.",
+      "name": "Zeichen vor der Menarche entfernen",
+      "description": "Dienst fuer zeichen vor der menarche entfernen.",
       "fields": {
         "entity_id": {
           "name": "Entität",
-          "description": "Ziel-Menstruationssensor."
+          "description": "Wert für entität."
         },
         "profile": {
           "name": "Profil",
-          "description": "Konfigurierter Profil-Slug."
+          "description": "Wert für profil."
         },
         "entry_id": {
-          "name": "Entry-ID",
-          "description": "Kennung des Config-Entries."
+          "name": "Eintrags-ID",
+          "description": "Wert für eintrags-id."
         },
         "pre_menarche_sign": {
-          "name": "Pubertätszeichen",
-          "description": "Das zu entfernende Körperzeichen."
+          "name": "Zeichen vor der Menarche",
+          "description": "Wert für zeichen vor der menarche."
+        }
+      }
+    },
+    "set_menopause_mode": {
+      "name": "Menopause-Modus festlegen",
+      "description": "Dienst fuer menopause-modus festlegen.",
+      "fields": {
+        "entity_id": {
+          "name": "Entität",
+          "description": "Wert für entität."
+        },
+        "profile": {
+          "name": "Profil",
+          "description": "Wert für profil."
+        },
+        "entry_id": {
+          "name": "Eintrags-ID",
+          "description": "Wert für eintrags-id."
+        },
+        "is_menopause": {
+          "name": "Menopause",
+          "description": "Wert für menopause."
+        },
+        "menopause_start_date": {
+          "name": "Beginn der Menopause",
+          "description": "Wert für beginn der menopause."
+        }
+      }
+    },
+    "update_menopause_date": {
+      "name": "Menopause-Datum aktualisieren",
+      "description": "Dienst fuer menopause-datum aktualisieren.",
+      "fields": {
+        "entity_id": {
+          "name": "Entität",
+          "description": "Wert für entität."
+        },
+        "profile": {
+          "name": "Profil",
+          "description": "Wert für profil."
+        },
+        "entry_id": {
+          "name": "Eintrags-ID",
+          "description": "Wert für eintrags-id."
+        },
+        "menopause_start_date": {
+          "name": "Beginn der Menopause",
+          "description": "Wert für beginn der menopause."
+        }
+      }
+    },
+    "save_timer_state": {
+      "name": "Timerstatus speichern",
+      "description": "Dienst fuer timerstatus speichern.",
+      "fields": {
+        "entity_id": {
+          "name": "Entität",
+          "description": "Wert für entität."
+        },
+        "profile": {
+          "name": "Profil",
+          "description": "Wert für profil."
+        },
+        "entry_id": {
+          "name": "Eintrags-ID",
+          "description": "Wert für eintrags-id."
+        },
+        "remaining_seconds": {
+          "name": "Verbleibende Sekunden",
+          "description": "Wert für verbleibende sekunden."
+        },
+        "total_seconds": {
+          "name": "Gesamtsekunden",
+          "description": "Wert für gesamtsekunden."
+        },
+        "selected_product": {
+          "name": "Ausgewähltes Produkt",
+          "description": "Wert für ausgewähltes produkt."
+        },
+        "is_running": {
+          "name": "Läuft",
+          "description": "Wert für läuft."
+        },
+        "saved_at": {
+          "name": "Gespeichert um",
+          "description": "Wert für gespeichert um."
+        }
+      }
+    },
+    "export_doctor_report": {
+      "name": "Arztbericht exportieren",
+      "description": "Dienst fuer arztbericht exportieren.",
+      "fields": {
+        "entity_id": {
+          "name": "Entität",
+          "description": "Wert für entität."
+        },
+        "profile": {
+          "name": "Profil",
+          "description": "Wert für profil."
+        },
+        "entry_id": {
+          "name": "Eintrags-ID",
+          "description": "Wert für eintrags-id."
+        },
+        "days_back": {
+          "name": "Tage zurück",
+          "description": "Wert für tage zurück."
+        },
+        "patient_name": {
+          "name": "Name der Person",
+          "description": "Wert für name der person."
+        },
+        "patient_birthdate": {
+          "name": "Geburtsdatum",
+          "description": "Wert für geburtsdatum."
+        },
+        "language": {
+          "name": "Sprache",
+          "description": "Wert für sprache."
         }
       }
     }

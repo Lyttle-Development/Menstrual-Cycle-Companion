@@ -26,7 +26,10 @@
 
   i18n.normalizeLang = i18n.normalizeLang || ((language) => {
     const normalized = String(language || 'en').toLowerCase();
-    return normalized.startsWith('de') ? 'de' : 'en';
+    if (normalized.startsWith('de')) return 'de';
+    if (normalized.startsWith('fr')) return 'fr';
+    if (normalized.startsWith('nl')) return 'nl';
+    return 'en';
   });
 
   i18n.detectLang = i18n.detectLang || ((language) => i18n.normalizeLang(language || navigator.language || 'en'));

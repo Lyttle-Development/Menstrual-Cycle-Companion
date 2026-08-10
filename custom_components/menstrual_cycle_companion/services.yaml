@@ -50,39 +50,6 @@ remove_cycle_start:
       selector:
         text:
 
-set_cycle_range:
-  name: Set cycle start and end dates
-  description: Add every confirmed bleeding day from the start date through the end date, inclusive.
-  fields:
-    entity_id:
-      required: false
-      example: "sensor.anna_zyklus"
-      selector:
-        entity:
-          domain: sensor
-    profile:
-      required: false
-      example: "anna"
-      selector:
-        text:
-    entry_id:
-      required: false
-      example: "a1b2c3d4e5f6..."
-      selector:
-        text:
-    start_date:
-      name: Start date
-      required: true
-      example: "2026-03-01"
-      selector:
-        date:
-    end_date:
-      name: End date
-      required: true
-      example: "2026-03-05"
-      selector:
-        date:
-
 set_cycle_history:
   name: Replace full cycle history
   description: Replace complete confirmed bleeding history with a list of dates.
@@ -228,3 +195,641 @@ refresh_cycle_model:
       example: "a1b2c3d4e5f6..."
       selector:
         text:
+
+log_product_usage:
+  name: Log product usage
+  description: Log tampon, pad, cup, or liner usage for statistics and timer integrations.
+  fields:
+    entity_id:
+      required: false
+      example: "sensor.anna"
+      selector:
+        entity:
+          domain: sensor
+    profile:
+      required: false
+      example: "anna"
+      selector:
+        text:
+    entry_id:
+      required: false
+      example: "a1b2c3d4e5f6..."
+      selector:
+        text:
+    product:
+      required: true
+      example: "tampon"
+      selector:
+        select:
+          options:
+            - "tampon"
+            - "pad"
+            - "cup"
+            - "underwear"
+            - "liner"
+    action:
+      required: false
+      example: "used"
+      selector:
+        select:
+          options:
+            - "used"
+            - "emptied"
+    quantity:
+      required: false
+      example: 1
+      selector:
+        number:
+          min: 1
+          max: 50
+          mode: box
+    date:
+      required: false
+      example: "2026-07-15"
+      description: Optional backfill date in YYYY-MM-DD format. Defaults to today.
+      selector:
+        text:
+
+manage_household_inventory:
+  name: Manage household inventory
+  description: Manage shared household stock for tampons, pads, cups, liners, and period underwear.
+  fields:
+    inventory_action:
+      required: true
+      example: "add"
+      selector:
+        select:
+          options:
+            - "set"
+            - "add"
+            - "consume"
+            - "set_thresholds"
+            - "add_to_shopping_list"
+            - "reset"
+    product:
+      required: false
+      example: "tampon"
+      selector:
+        select:
+          options:
+            - "tampon"
+            - "pad"
+            - "cup"
+            - "liner"
+            - "underwear"
+    quantity:
+      required: false
+      example: 5
+      selector:
+        number:
+          min: 0
+          max: 5000
+          mode: box
+    warning_threshold:
+      required: false
+      example: 10
+      selector:
+        number:
+          min: 0
+          max: 5000
+          mode: box
+    critical_threshold:
+      required: false
+      example: 5
+      selector:
+        number:
+          min: 0
+          max: 5000
+          mode: box
+    member:
+      required: false
+      example: "Anna"
+      description: Name of the household member for manual consumption logs.
+      selector:
+        text:
+    underwear_total_owned:
+      required: false
+      example: 12
+      description: Total number of period underwear pieces owned (used to calculate availability and washing alerts).
+      selector:
+        number:
+          min: 1
+          max: 5000
+          mode: box
+
+add_symptom:
+  name: Add or update symptom data for a date
+  description: Add or update symptom data for a specific date. Data is merged with existing entries.
+  fields:
+    entity_id:
+      required: false
+      example: "sensor.anna"
+      selector:
+        entity:
+          domain: sensor
+    profile:
+      required: false
+      example: "anna"
+      selector:
+        text:
+    entry_id:
+      required: false
+      example: "a1b2c3d4e5f6..."
+      selector:
+        text:
+    date:
+      required: true
+      example: "2026-03-15"
+      description: Date in YYYY-MM-DD format
+      selector:
+        text:
+    symptom_data:
+      required: true
+      description: Dictionary with symptom fields. Optional fields - bleeding_strength, spotting, intercourse, pain (list), basal_temp (number), hygiene (list), test
+      selector:
+        object:
+
+remove_symptom:
+  name: Remove symptom data for a date
+  description: Remove all symptom data for a specific date.
+  fields:
+    entity_id:
+      required: false
+      example: "sensor.anna"
+      selector:
+        entity:
+          domain: sensor
+    profile:
+      required: false
+      example: "anna"
+      selector:
+        text:
+    entry_id:
+      required: false
+      example: "a1b2c3d4e5f6..."
+      selector:
+        text:
+    date:
+      required: true
+      example: "2026-03-15"
+      description: Date in YYYY-MM-DD format
+      selector:
+        text:
+
+get_symptom:
+  name: Get symptom data for a date
+  description: Retrieve symptom data for a specific date.
+  fields:
+    entity_id:
+      required: false
+      example: "sensor.anna"
+      selector:
+        entity:
+          domain: sensor
+    profile:
+      required: false
+      example: "anna"
+      selector:
+        text:
+    entry_id:
+      required: false
+      example: "a1b2c3d4e5f6..."
+      selector:
+        text:
+    date:
+      required: true
+      example: "2026-03-15"
+      description: Date in YYYY-MM-DD format
+      selector:
+        text:
+
+set_pregnancy_mode:
+  name: Set pregnancy mode
+  description: Enable or disable pregnancy mode. When enabled, the sensor reports pregnancy state with weeks pregnant and due date.
+  fields:
+    entity_id:
+      required: false
+      example: "sensor.anna"
+      selector:
+        entity:
+          domain: sensor
+    profile:
+      required: false
+      example: "anna"
+      selector:
+        text:
+    entry_id:
+      required: false
+      example: "a1b2c3d4e5f6..."
+      selector:
+        text:
+    is_pregnant:
+      required: true
+      example: true
+      description: Set to true to enable pregnancy mode, false to disable.
+      selector:
+        boolean:
+    pregnancy_start_date:
+      required: false
+      example: "2026-01-15"
+      description: First day of last menstrual period (YYYY-MM-DD). Defaults to last known period start.
+      selector:
+        text:
+
+update_pregnancy_date:
+  name: Update pregnancy start date
+  description: Update the first day of the last menstrual period used for pregnancy calculations.
+  fields:
+    entity_id:
+      required: false
+      example: "sensor.anna"
+      selector:
+        entity:
+          domain: sensor
+    profile:
+      required: false
+      example: "anna"
+      selector:
+        text:
+    entry_id:
+      required: false
+      example: "a1b2c3d4e5f6..."
+      selector:
+        text:
+    pregnancy_start_date:
+      required: true
+      example: "2026-01-15"
+      description: First day of last menstrual period in YYYY-MM-DD format.
+      selector:
+        text:
+
+set_menarche_mode:
+  name: Set menarche mode
+  description: Enable pre-menarche tracking or confirm that menarche has occurred. Use this for tracking puberty signs before the first period.
+  fields:
+    entity_id:
+      required: false
+      example: "sensor.anna"
+      selector:
+        entity:
+          domain: sensor
+    profile:
+      required: false
+      example: "anna"
+      selector:
+        text:
+    entry_id:
+      required: false
+      example: "a1b2c3d4e5f6..."
+      selector:
+        text:
+    is_menarche:
+      required: true
+      example: false
+      description: Set to false to enable pre-menarche tracking, true when menarche has occurred.
+      selector:
+        boolean:
+    estimated_menarche_date:
+      required: false
+      example: "2026-12-01"
+      description: Estimated date when menarche is expected (YYYY-MM-DD).
+      selector:
+        text:
+    family_menarche_age:
+      required: false
+      example: 12
+      description: Age of menarche in the family (e.g. mother, sister), used for estimation.
+      selector:
+        number:
+          min: 9
+          max: 16
+          mode: box
+
+update_menarche_date:
+  name: Update menarche date
+  description: Record the actual date when menarche (first period) occurred.
+  fields:
+    entity_id:
+      required: false
+      example: "sensor.anna"
+      selector:
+        entity:
+          domain: sensor
+    profile:
+      required: false
+      example: "anna"
+      selector:
+        text:
+    entry_id:
+      required: false
+      example: "a1b2c3d4e5f6..."
+      selector:
+        text:
+    date:
+      required: true
+      example: "2026-06-15"
+      description: Date when menarche occurred (YYYY-MM-DD).
+      selector:
+        text:
+
+log_first_period:
+  name: Log first period
+  description: Atomically records menarche date and adds the first cycle start. Use this to transition a profile out of Pre-Menarche mode when the first period begins.
+  fields:
+    entity_id:
+      required: false
+      example: "sensor.anna"
+      selector:
+        entity:
+          domain: sensor
+    profile:
+      required: false
+      example: "anna"
+      selector:
+        text:
+    entry_id:
+      required: false
+      example: "a1b2c3d4e5f6..."
+      selector:
+        text:
+    date:
+      required: true
+      example: "2026-06-15"
+      description: Date of the first period (YYYY-MM-DD).
+      selector:
+        text:
+
+get_menarche_info:
+  name: Get menarche information
+  description: Retrieve menarche and pre-menarche tracking data for a profile.
+  fields:
+    entity_id:
+      required: false
+      example: "sensor.anna"
+      selector:
+        entity:
+          domain: sensor
+    profile:
+      required: false
+      example: "anna"
+      selector:
+        text:
+    entry_id:
+      required: false
+      example: "a1b2c3d4e5f6..."
+      selector:
+        text:
+
+add_pre_menarche_sign:
+  name: Add pre-menarche body sign
+  description: Record or update a puberty body sign for pre-menarche tracking (Tanner stage classification).
+  fields:
+    entity_id:
+      required: false
+      example: "sensor.anna"
+      selector:
+        entity:
+          domain: sensor
+    profile:
+      required: false
+      example: "anna"
+      selector:
+        text:
+    entry_id:
+      required: false
+      example: "a1b2c3d4e5f6..."
+      selector:
+        text:
+    pre_menarche_sign:
+      required: true
+      example: "breast_development"
+      description: The puberty sign to record.
+      selector:
+        select:
+          options:
+            - "pubic_hair_growth"
+            - "breast_development"
+            - "height_spurt"
+            - "mood_changes"
+            - "acne"
+            - "body_odor"
+            - "vaginal_discharge"
+    tanner_stage:
+      required: true
+      example: "stage_2"
+      description: Current stage or level for the selected sign.
+      selector:
+        text:
+
+remove_pre_menarche_sign:
+  name: Remove pre-menarche body sign
+  description: Remove a recorded puberty body sign from pre-menarche tracking.
+  fields:
+    entity_id:
+      required: false
+      example: "sensor.anna"
+      selector:
+        entity:
+          domain: sensor
+    profile:
+      required: false
+      example: "anna"
+      selector:
+        text:
+    entry_id:
+      required: false
+      example: "a1b2c3d4e5f6..."
+      selector:
+        text:
+    pre_menarche_sign:
+      required: true
+      example: "breast_development"
+      description: The puberty sign to remove.
+      selector:
+        select:
+          options:
+            - "pubic_hair_growth"
+            - "breast_development"
+            - "height_spurt"
+            - "mood_changes"
+            - "acne"
+            - "body_odor"
+            - "vaginal_discharge"
+
+set_menopause_mode:
+  name: Set menopause mode
+  description: Enable or disable menopause tracking mode.
+  fields:
+    entity_id:
+      required: false
+      example: "sensor.anna"
+      selector:
+        entity:
+          domain: sensor
+    profile:
+      required: false
+      example: "anna"
+      selector:
+        text:
+    entry_id:
+      required: false
+      example: "a1b2c3d4e5f6..."
+      selector:
+        text:
+    is_menopause:
+      required: true
+      example: true
+      description: Set to true to activate menopause mode, false to deactivate.
+      selector:
+        boolean:
+    menopause_start_date:
+      required: false
+      example: "2024-06-01"
+      description: Date when menopause started (YYYY-MM-DD). Optional.
+      selector:
+        text:
+
+update_menopause_date:
+  name: Update menopause date
+  description: Update the menopause start date.
+  fields:
+    entity_id:
+      required: false
+      example: "sensor.anna"
+      selector:
+        entity:
+          domain: sensor
+    profile:
+      required: false
+      example: "anna"
+      selector:
+        text:
+    entry_id:
+      required: false
+      example: "a1b2c3d4e5f6..."
+      selector:
+        text:
+    menopause_start_date:
+      required: true
+      example: "2024-06-01"
+      description: Date when menopause started (YYYY-MM-DD).
+      selector:
+        text:
+
+save_timer_state:
+  name: Save timer state
+  description: |
+    Persist the current countdown timer state (remaining time, selected product,
+    running/paused) so it survives page reloads and is available on other devices.
+    Called automatically by the Period Countdown Timer card.
+  fields:
+    entity_id:
+      required: false
+      example: "sensor.anna_zyklus"
+      selector:
+        entity:
+          domain: sensor
+    profile:
+      required: false
+      example: "anna"
+      selector:
+        text:
+    entry_id:
+      required: false
+      example: "a1b2c3d4e5f6..."
+      selector:
+        text:
+    remaining_seconds:
+      required: true
+      example: 10800
+      description: Remaining countdown seconds at the time of saving.
+      selector:
+        number:
+          min: 0
+          max: 86400
+          mode: box
+    total_seconds:
+      required: true
+      example: 25200
+      description: Total countdown duration in seconds for the selected product.
+      selector:
+        number:
+          min: 0
+          max: 86400
+          mode: box
+    selected_product:
+      required: false
+      example: "tampon"
+      description: Currently selected product key (tampon, pad, cup, liner, underwear).
+      selector:
+        text:
+    is_running:
+      required: true
+      example: true
+      description: Whether the timer was actively running when the state was saved.
+      selector:
+        boolean:
+    saved_at:
+      required: true
+      example: 1750000000000
+      description: >
+        JavaScript Date.now() millisecond timestamp when the state was saved.
+        Used to calculate elapsed time when restoring a running timer.
+      selector:
+        number:
+          min: 0
+          mode: box
+
+export_doctor_report:
+  name: Export doctor report (HTML)
+  description: |
+    Generates a professional HTML medical report from the cycle history and symptom data.
+    The file is saved to `<config>/menstrual_cycle_companion_exports/`.
+    Open the file in a browser and use "Print to PDF" to create a PDF.
+  fields:
+    entity_id:
+      required: false
+      example: "sensor.anna_zyklus"
+      selector:
+        entity:
+          domain: sensor
+    profile:
+      required: false
+      example: "anna"
+      selector:
+        text:
+    entry_id:
+      required: false
+      example: "a1b2c3d4e5f6..."
+      selector:
+        text:
+    days_back:
+      required: false
+      example: 180
+      description: Number of days to include in the report (30–730). Default is 180 (6 months).
+      selector:
+        number:
+          min: 30
+          max: 730
+          mode: box
+    patient_name:
+      required: false
+      example: "Anna Müller"
+      description: Patient name to include in the report header (optional).
+      selector:
+        text:
+    patient_birthdate:
+      required: false
+      example: "1995-06-15"
+      description: Patient date of birth in YYYY-MM-DD format (optional).
+      selector:
+        text:
+    language:
+      required: false
+      example: "de"
+      description: Report language. "de" for German, "en" for English. Default is "de".
+      selector:
+        select:
+          options:
+            - "de"
+            - "en"

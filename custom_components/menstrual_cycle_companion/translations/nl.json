@@ -1,0 +1,61 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Menstruatiecyclusassistent",
+        "description": "Maak een profiel (gebruikersnaam en vriendelijke naam) voor cyclusregistratie.",
+        "data": {
+          "profile": "Gebruikersnaam/profiel",
+          "friendly_name": "Vriendelijke naam",
+          "icon": "Pictogram (optioneel, bijv. mdi:calendar-heart)"
+        }
+      }
+    },
+    "error": {
+      "invalid_profile": "Profiel moet letters of cijfers bevatten."
+    }
+  },
+  "services": {
+    "add_cycle_start": {
+      "name": "Startdag van cyclus toevoegen",
+      "description": "Voeg één bevestigde bloedingsdag toe in JJJJ-MM-DD-indeling.",
+      "fields": {"entity_id": "Sensorentiteit", "profile": "Profiel", "entry_id": "Configuratie-ID", "date": "Datum"}
+    },
+    "remove_cycle_start": {
+      "name": "Startdag van cyclus verwijderen",
+      "description": "Verwijder één bevestigde bloedingsdag in JJJJ-MM-DD-indeling.",
+      "fields": {"entity_id": "Sensorentiteit", "profile": "Profiel", "entry_id": "Configuratie-ID", "date": "Datum"}
+    },
+    "set_cycle_range": {
+      "name": "Start- en einddatum van cyclus instellen",
+      "description": "Voeg elke bevestigde bloedingsdag toe vanaf de startdatum tot en met de einddatum.",
+      "fields": {"entity_id": "Sensorentiteit", "profile": "Profiel", "entry_id": "Configuratie-ID", "start_date": "Startdatum", "end_date": "Einddatum"}
+    },
+    "set_cycle_history": {
+      "name": "Volledige cyclusgeschiedenis vervangen",
+      "description": "Vervang de volledige bevestigde bloedingsgeschiedenis door een lijst met datums.",
+      "fields": {"entity_id": "Sensorentiteit", "profile": "Profiel", "entry_id": "Configuratie-ID", "dates": "Datums"}
+    },
+    "set_period_duration": {
+      "name": "Duur van menstruatie instellen",
+      "description": "Stel de voorspelde menstruatieduur in (gebruikt voor markeringen op kaarten).",
+      "fields": {"entity_id": "Sensorentiteit", "profile": "Profiel", "entry_id": "Configuratie-ID", "days": "Aantal dagen"}
+    },
+    "erase_all_history": {
+      "name": "Volledige cyclusgeschiedenis wissen",
+      "description": "Destructieve actie. Verwijdert de volledige opgeslagen geschiedenis.",
+      "fields": {"entity_id": "Sensorentiteit", "profile": "Profiel", "entry_id": "Configuratie-ID", "erase_all": "Verwijdering bevestigen"}
+    },
+    "export_history": {
+      "name": "Cyclusgeschiedenis exporteren",
+      "description": "Exporteer de huidige geschiedenis naar een lokaal bestand.",
+      "fields": {"entity_id": "Sensorentiteit", "profile": "Profiel", "entry_id": "Configuratie-ID", "format": "Bestandsindeling", "filename": "Bestandsnaam"}
+    },
+    "refresh_cycle_model": {
+      "name": "Cyclusmodel vernieuwen",
+      "description": "Herbereken alle datumgebaseerde sensorwaarden, inclusief het aantal dagen tot de volgende voorspelde start.",
+      "fields": {"entity_id": "Sensorentiteit", "profile": "Profiel", "entry_id": "Configuratie-ID"}
+    }
+  }
+}
+

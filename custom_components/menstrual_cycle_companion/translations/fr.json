@@ -1,0 +1,61 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Assistant de cycle menstruel",
+        "description": "Créez un profil (nom d’utilisateur et nom convivial) pour le suivi du cycle.",
+        "data": {
+          "profile": "Nom d’utilisateur/profil",
+          "friendly_name": "Nom convivial",
+          "icon": "Icône (facultatif, par ex. mdi:calendar-heart)"
+        }
+      }
+    },
+    "error": {
+      "invalid_profile": "Le profil doit contenir des lettres ou des chiffres."
+    }
+  },
+  "services": {
+    "add_cycle_start": {
+      "name": "Ajouter le jour de début du cycle",
+      "description": "Ajoutez un jour de saignement confirmé au format AAAA-MM-JJ.",
+      "fields": {"entity_id": "Entité du capteur", "profile": "Profil", "entry_id": "ID de l’entrée de configuration", "date": "Date"}
+    },
+    "remove_cycle_start": {
+      "name": "Supprimer le jour de début du cycle",
+      "description": "Supprimez un jour de saignement confirmé au format AAAA-MM-JJ.",
+      "fields": {"entity_id": "Entité du capteur", "profile": "Profil", "entry_id": "ID de l’entrée de configuration", "date": "Date"}
+    },
+    "set_cycle_range": {
+      "name": "Définir les dates de début et de fin du cycle",
+      "description": "Ajoutez chaque jour de saignement confirmé entre les dates de début et de fin, incluses.",
+      "fields": {"entity_id": "Entité du capteur", "profile": "Profil", "entry_id": "ID de l’entrée de configuration", "start_date": "Date de début", "end_date": "Date de fin"}
+    },
+    "set_cycle_history": {
+      "name": "Remplacer l’historique complet du cycle",
+      "description": "Remplacez l’historique complet des saignements confirmés par une liste de dates.",
+      "fields": {"entity_id": "Entité du capteur", "profile": "Profil", "entry_id": "ID de l’entrée de configuration", "dates": "Dates"}
+    },
+    "set_period_duration": {
+      "name": "Définir la durée des règles",
+      "description": "Définissez la durée prévue des règles (utilisée pour les marqueurs des cartes).",
+      "fields": {"entity_id": "Entité du capteur", "profile": "Profil", "entry_id": "ID de l’entrée de configuration", "days": "Nombre de jours"}
+    },
+    "erase_all_history": {
+      "name": "Effacer tout l’historique du cycle",
+      "description": "Action destructive. Supprime tout l’historique enregistré.",
+      "fields": {"entity_id": "Entité du capteur", "profile": "Profil", "entry_id": "ID de l’entrée de configuration", "erase_all": "Confirmer la suppression"}
+    },
+    "export_history": {
+      "name": "Exporter l’historique du cycle",
+      "description": "Exportez l’historique actuel vers un fichier local.",
+      "fields": {"entity_id": "Entité du capteur", "profile": "Profil", "entry_id": "ID de l’entrée de configuration", "format": "Format du fichier", "filename": "Nom du fichier"}
+    },
+    "refresh_cycle_model": {
+      "name": "Actualiser le modèle du cycle",
+      "description": "Recalculez toutes les valeurs de capteur basées sur les dates, notamment le nombre de jours avant le prochain début prévu.",
+      "fields": {"entity_id": "Entité du capteur", "profile": "Profil", "entry_id": "ID de l’entrée de configuration"}
+    }
+  }
+}
+

@@ -162,7 +162,7 @@ Home Assistant automation is required.
 
 Cards are intentionally distributed separately so the integration remains a standard HACS integration and the frontend package can be updated independently. Install [`menstrual-cycle-companion-cards`](https://github.com/Lyttle-Development/menstrual-cycle-companion-cards) for:
 
-- `custom:menstrual-cycle-gauge-card` and `custom:menstrual-cycle-heatmap-card`
+- `custom:menstrual-gauge-card` and `custom:menstrual-cycle-heatmap-card`
 - Calendar, countdown, compact status, history-row, product-inventory, and statistics cards from the companion cards repository
 
 The cards require this integration and a configured sensor.
@@ -174,8 +174,9 @@ on the predicted next start and should not be treated as medical guidance.
 The gauge card's calendar editor uses range selection by default: click the
 first bleeding day, then click the last bleeding day. The selected interval is
 shown immediately, and the completed range is written as confirmed bleeding
-days. Set `calendar_selection_mode: toggle` in the card configuration to retain
-single-day add/remove behavior.
+days. Right-click a saved day, or hold it on mobile, to remove its contiguous
+confirmed range. Set `calendar_selection_mode: toggle` in the card configuration
+to use single-day add/remove behavior.
 
 ## Privacy and responsible use
 

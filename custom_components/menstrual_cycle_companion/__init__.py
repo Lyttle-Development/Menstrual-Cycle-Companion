@@ -54,6 +54,7 @@ from .const import (
     SERVICE_ERASE_ALL_HISTORY,
     SERVICE_EXPORT_HISTORY,
     SERVICE_FIELD_DATE,
+    SERVICE_FIELD_END_DATE,
     SERVICE_FIELD_DATES,
     SERVICE_FIELD_DAYS,
     SERVICE_FIELD_ENTITY_ID,
@@ -71,6 +72,7 @@ from .const import (
     SERVICE_FIELD_PRE_MENARCHE_SIGN,
     SERVICE_FIELD_PROFILE,
     SERVICE_FIELD_QUANTITY,
+    SERVICE_FIELD_START_DATE,
     SERVICE_FIELD_SYMPTOM_DATA,
     SERVICE_FIELD_TANNER_STAGE,
     SERVICE_FIELD_WARNING_THRESHOLD,
@@ -87,6 +89,7 @@ from .const import (
     SERVICE_REMOVE_PRE_MENARCHE_SIGN,
     SERVICE_REMOVE_SYMPTOM,
     SERVICE_SET_CYCLE_HISTORY,
+    SERVICE_SET_CYCLE_RANGE,
     SERVICE_SET_MENARCHE_MODE,
     SERVICE_SET_MENOPAUSE_MODE,
     SERVICE_SET_PERIOD_DURATION,
@@ -738,6 +741,9 @@ def _register_domain_services(hass: HomeAssistant) -> None:
     async def async_remove(call: ServiceCall) -> None:
         await _async_handle_remove(hass, call)
 
+    async def async_set_range(call: ServiceCall) -> None:
+        await _async_handle_set_range(hass, call)
+
     async def async_set_history(call: ServiceCall) -> None:
         await _async_handle_set_history(hass, call)
 
@@ -816,6 +822,17 @@ def _register_domain_services(hass: HomeAssistant) -> None:
         SERVICE_REMOVE_CYCLE_START,
         async_remove,
         schema=vol.Schema({**common_profile_field, vol.Required(SERVICE_FIELD_DATE): cv.string}),
+    )
+
+    hass.services.async_register(
+        DOMAIN,
+        SERVICE_SET_CYCLE_RANGE,
+        async_set_range,
+        schema=vol.Schema({
+            **common_profile_field,
+            vol.Required(SERVICE_FIELD_START_DATE): cv.string,
+            vol.Required(SERVICE_FIELD_END_DATE): cv.string,
+        }),
     )
 
     hass.services.async_register(
@@ -1402,6 +1419,23 @@ async def _async_handle_remove(hass: HomeAssistant, call: ServiceCall) -> None:
     runtime = _runtime_for_call(hass, call)
     date_iso = _normalize_date_or_raise(call.data[SERVICE_FIELD_DATE])
     runtime.history = [item for item in runtime.history if item != date_iso]
+    await _async_save_and_notify(hass, runtime)
+
+
+async def _async_handle_set_range(hass: HomeAssistant, call: ServiceCall) -> None:
+    """Add every calendar day in an inclusive start/end range."""
+    runtime = _runtime_for_call(hass, call)
+    start = date.fromisoformat(_normalize_date_or_raise(call.data[SERVICE_FIELD_START_DATE]))
+    end = date.fromisoformat(_normalize_date_or_raise(call.data[SERVICE_FIELD_END_DATE]))
+    if start > end:
+        start, end = end, start
+
+    existing = set(normalize_history(runtime.history))
+    cursor = start
+    while cursor <= end:
+        existing.add(cursor.isoformat())
+        cursor = cursor.fromordinal(cursor.toordinal() + 1)
+    runtime.history = sorted(existing)
     await _async_save_and_notify(hass, runtime)
 
 

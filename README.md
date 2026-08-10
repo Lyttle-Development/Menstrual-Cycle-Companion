@@ -14,6 +14,9 @@ A privacy-first Home Assistant custom integration for recording menstrual bleedi
 - Predicted next start, average cycle length, fertile-window dates, and days until the prediction.
 - Services for adding, removing, importing, exporting, and clearing history.
 - Inclusive cycle start/end date selection from the companion gauge card.
+- Daily symptom and bleeding-strength logging, product usage statistics, and timer state.
+- Optional pregnancy, pre-menarche, menopause, NFP analysis, household inventory, and doctor-report workflows.
+- Automatic serving and registration of the expanded companion card set and localized translations.
 - A separate companion card repository: [`menstrual-cycle-companion-cards`](https://github.com/Lyttle-Development/menstrual-cycle-companion-cards).
 
 ## Install with HACS
@@ -76,7 +79,7 @@ The master sensor state is one of `period`, `fertile`, `pms`, or `neutral`. Ever
 - `grouped_starts`
 - `bleeding_blocks`
 - `next_predicted_start`
-- `predicted_cycle_starts` — the next 12 predicted cycle starts
+- `predicted_cycle_starts` — configurable future predicted cycle starts
 - `avg_cycle_length`
 - `cycle_length_samples`
 - `cycle_length_variability_days`
@@ -121,6 +124,11 @@ All services accept `entity_id`, `profile`, or `entry_id` when more than one pro
 - `menstrual_cycle_companion.refresh_cycle_model`
 - `menstrual_cycle_companion.export_history`
 - `menstrual_cycle_companion.erase_all_history`
+- `menstrual_cycle_companion.add_symptom` / `remove_symptom` / `get_symptom`
+- `menstrual_cycle_companion.log_product_usage`
+- `menstrual_cycle_companion.manage_household_inventory`
+- `menstrual_cycle_companion.set_pregnancy_mode` / `set_menarche_mode` / `set_menopause_mode`
+- `menstrual_cycle_companion.export_doctor_report`
 
 Deletion requires both an explicit sensor `entity_id` and `erase_all: true`:
 
@@ -154,8 +162,8 @@ Home Assistant automation is required.
 
 Cards are intentionally distributed separately so the integration remains a standard HACS integration and the frontend package can be updated independently. Install [`menstrual-cycle-companion-cards`](https://github.com/Lyttle-Development/menstrual-cycle-companion-cards) for:
 
-- `custom:menstrual-cycle-gauge-card`
-- `custom:menstrual-cycle-heatmap-card`
+- `custom:menstrual-cycle-gauge-card` and `custom:menstrual-cycle-heatmap-card`
+- Calendar, countdown, compact status, history-row, product-inventory, and statistics cards from the companion cards repository
 
 The cards require this integration and a configured sensor.
 

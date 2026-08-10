@@ -1,0 +1,92 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Ciclo menstrual",
+        "description": "Crea un perfil (nombre de usuario + nombre para mostrar) para el seguimiento del ciclo.",
+        "data": {
+          "profile": "Nombre de usuario/Perfil",
+          "friendly_name": "Nombre para mostrar",
+          "icon": "Icono (opcional, p. ej. mdi:calendar-heart)"
+        }
+      }
+    },
+    "error": {
+      "invalid_profile": "El perfil debe contener letras o números."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Ajustes del ciclo menstrual",
+        "description": "Ajusta la configuración del seguimiento del ciclo. Los cambios se guardan de inmediato.",
+        "data": {
+          "friendly_name": "Nombre para mostrar",
+          "icon": "Icono (opcional, p. ej. mdi:calendar-heart)",
+          "period_duration_days": "Duración del período (días)",
+          "pregnancy_enabled": "Activar modo de embarazo",
+          "pregnancy_start_date": "Fecha de inicio del embarazo (AAAA-MM-DD)",
+          "pre_menarche_enabled": "Activar seguimiento previo a la menarquia",
+          "estimated_menarche_date": "Fecha estimada de la menarquia (AAAA-MM-DD)",
+          "family_menarche_age": "Edad de menarquia en la familia (8–20, opcional)",
+          "menopause_enabled": "Activar modo de menopausia",
+          "menopause_start_date": "Fecha de inicio de la menopausia (AAAA-MM-DD)",
+          "cycle_length_override": "Anular duración del ciclo (días, 0 = automático)",
+          "nfp_analysis_mode": "Modo de análisis PFN"
+        },
+        "data_description": {
+          "period_duration_days": "Número de días que suele durar el período (1–14).",
+          "pregnancy_enabled": "Activa el modo de seguimiento del embarazo. La fecha de inicio del embarazo se rellena automáticamente a partir del último inicio de ciclo si se deja vacía.",
+          "pregnancy_start_date": "Primer día de la última menstruación (FUM). Deja el campo vacío para usar el último inicio de ciclo registrado.",
+          "pre_menarche_enabled": "Registra los signos de pubertad antes de la primera menstruación (menarquia).",
+          "estimated_menarche_date": "Fecha estimada de la primera menstruación. Se usa para la cuenta regresiva.",
+          "family_menarche_age": "Edad de menarquia en la familia (madre/hermana), utilizada para estimar la edad esperada.",
+          "menopause_enabled": "Activa el modo de seguimiento de la menopausia.",
+          "menopause_start_date": "Fecha en que comenzó la menopausia (AAAA-MM-DD). Déjalo vacío si es desconocida.",
+          "cycle_length_override": "Anula la duración media del ciclo calculada automáticamente. Ponlo en 0 para usar el valor calculado automáticamente a partir de tu historial (recomendado). Ponlo entre 20 y 38 para fijar manualmente la duración del ciclo utilizada en el cálculo de la ventana fértil y la ovulación.",
+          "nfp_analysis_mode": "Controla cómo se calculan la ovulación y la ventana fértil. El modo 'híbrido' (predeterminado) aprende de los datos de temperatura observados y recurre a la fórmula estadística cuando es necesario. El modo 'estricto' solo muestra la ovulación y la ventana fértil cuando se confirma un aumento de temperatura en el ciclo actual."
+        }
+      }
+    },
+    "error": {
+      "invalid_date": "Formato de fecha inválido. Usa AAAA-MM-DD.",
+      "invalid_menarche_age": "La edad debe ser un número entre 8 y 20."
+    }
+  },
+  "services": {
+    "log_product_usage": {
+      "name": "Registrar uso de producto",
+      "description": "Registra el uso de productos de higiene menstrual para integraciones de temporizador y estadísticas a largo plazo.",
+      "fields": {
+        "entity_id": {
+          "name": "Entidad",
+          "description": "Sensor del indicador de menstruación de destino."
+        },
+        "profile": {
+          "name": "Perfil",
+          "description": "Slug del perfil configurado."
+        },
+        "entry_id": {
+          "name": "ID de entrada",
+          "description": "Identificador de la entrada de configuración."
+        },
+        "product": {
+          "name": "Producto",
+          "description": "Tipo de producto a registrar."
+        },
+        "action": {
+          "name": "Acción",
+          "description": "Acción de uso, por ejemplo usado o vaciado."
+        },
+        "quantity": {
+          "name": "Cantidad",
+          "description": "Cuántos productos o eventos de vaciado añadir."
+        },
+        "date": {
+          "name": "Fecha",
+          "description": "Fecha ISO opcional para registro retroactivo. Por defecto, hoy."
+        }
+      }
+    }
+  }
+}

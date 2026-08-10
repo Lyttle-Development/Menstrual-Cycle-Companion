@@ -120,7 +120,7 @@ class MenstruationCountdownTimer extends HTMLElement {
   connectedCallback() {
     try {
       this.setupEventListeners();
-      
+
       if (Notification.permission === "default") {
         Notification.requestPermission().catch(() => {});
       }
@@ -1048,7 +1048,7 @@ class MenstruationCountdownTimer extends HTMLElement {
       }
 
       const products = productConfig[status];
-      
+
       if (!products) {
         productSelect.disabled = true;
         this.updateUsageButtons();
@@ -1276,7 +1276,7 @@ class MenstruationCountdownTimer extends HTMLElement {
       const minutes = Math.floor((this.timerState.remainingSeconds % 3600) / 60);
       const seconds = this.timerState.remainingSeconds % 60;
 
-      let timeStr = hours > 0 
+      let timeStr = hours > 0
         ? `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`
         : `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
 
@@ -1628,7 +1628,7 @@ class MenstruationCountdownTimer extends HTMLElement {
         cups: "Menstrual Cups",
         liners: "Liners",
         underwears: "Period Panties",
-        
+
         // Symptom fields
         bleeding_strength: "Bleeding Strength",
         pain: "Pain",
@@ -2515,12 +2515,12 @@ class MenstruationCountdownTimer extends HTMLElement {
   }
 
   static getConfigElement() {
-    return document.createElement("menstrual-countdown-timer-editor");
+    return document.createElement("menstrual-cycle-companion-countdown-editor");
   }
 
   static getStubConfig() {
     return {
-      type: "custom:menstrual-countdown-timer",
+      type: "custom:menstrual-cycle-companion-countdown",
       entity: "sensor.anna",
       product_animations: true,
       animation_style: "realistic",
@@ -2881,12 +2881,12 @@ class MenstruationCountdownTimerEditor extends HTMLElement {
   }
 }
 
-customElements.define("menstrual-countdown-timer-editor", MenstruationCountdownTimerEditor);
-customElements.define("menstrual-countdown-timer", MenstruationCountdownTimer);
+customElements.define("menstrual-cycle-companion-countdown-editor", MenstruationCountdownTimerEditor);
+customElements.define("menstrual-cycle-companion-countdown", MenstruationCountdownTimer);
 
 window.customCards = window.customCards || [];
 window.customCards.push({
-  type: "menstrual-countdown-timer",
+  type: "menstrual-cycle-companion-countdown",
   name: "Menstruation Countdown Timer",
   description: "Countdown timer with direct product-usage logging for period products.",
 });

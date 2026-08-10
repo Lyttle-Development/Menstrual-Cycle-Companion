@@ -14,7 +14,7 @@ if (typeof _mcInventoryCardI18n.normalizeLang !== "function") {
 class MenstruationProductInventoryCard extends HTMLElement {
   static getStubConfig() {
     return {
-      type: "custom:menstrual-product-inventory-card",
+      type: "custom:menstrual-cycle-companion-product-inventory",
       inventory_entity: "sensor.household_product_stock",
       title: "Household inventory",
       member: "",
@@ -973,17 +973,17 @@ class MenstruationProductInventoryCardEditor extends HTMLElement {
   }
 }
 
-if (!customElements.get("menstrual-product-inventory-card-editor")) {
-  customElements.define("menstrual-product-inventory-card-editor", MenstruationProductInventoryCardEditor);
+if (!customElements.get("menstrual-cycle-companion-product-inventory-editor")) {
+  customElements.define("menstrual-cycle-companion-product-inventory-editor", MenstruationProductInventoryCardEditor);
 }
 
-if (!customElements.get("menstrual-product-inventory-card")) {
-  customElements.define("menstrual-product-inventory-card", MenstruationProductInventoryCard);
+if (!customElements.get("menstrual-cycle-companion-product-inventory")) {
+  customElements.define("menstrual-cycle-companion-product-inventory", MenstruationProductInventoryCard);
 }
 
 window.customCards = window.customCards || [];
 window.customCards.push({
-  type: "menstrual-product-inventory-card",
+  type: "menstrual-cycle-companion-product-inventory",
   name: "Menstruation Product Inventory Card",
   description: "Shared household inventory management for period products.",
 });

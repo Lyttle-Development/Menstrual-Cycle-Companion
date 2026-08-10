@@ -18,7 +18,7 @@ class MenstruationCycleHistoryCardRow extends HTMLElement {
 
   static getStubConfig() {
     return {
-      type: 'custom:menstrual-cycle-history-card-row',
+      type: 'custom:menstrual-cycle-companion-history-row',
       entity: 'sensor.menstruation',
       entry_id: '',
       title: 'Zyklus History',
@@ -191,7 +191,7 @@ class MenstruationCycleHistoryCardRow extends HTMLElement {
 
     const entityId = this._resolveEntityId();
     const stateObj = entityId ? this._hass?.states?.[entityId] : undefined;
-    
+
     if (!stateObj) {
       this.shadowRoot.innerHTML = '<ha-card><div class="pad">Entity not found</div></ha-card>';
       return;
@@ -590,17 +590,17 @@ class MenstruationCycleHistoryCardRowEditor extends HTMLElement {
   }
 }
 
-if (!customElements.get('menstrual-cycle-history-card-row-editor')) {
-  customElements.define('menstrual-cycle-history-card-row-editor', MenstruationCycleHistoryCardRowEditor);
+if (!customElements.get('menstrual-cycle-companion-history-row-editor')) {
+  customElements.define('menstrual-cycle-companion-history-row-editor', MenstruationCycleHistoryCardRowEditor);
 }
 
-if (!customElements.get('menstrual-cycle-history-card-row')) {
-  customElements.define('menstrual-cycle-history-card-row', MenstruationCycleHistoryCardRow);
+if (!customElements.get('menstrual-cycle-companion-history-row')) {
+  customElements.define('menstrual-cycle-companion-history-row', MenstruationCycleHistoryCardRow);
 }
 
 window.customCards = window.customCards || [];
 window.customCards.push({
-  type: 'menstrual-cycle-history-card-row',
-  name: 'Menstruation Cycle History (Table)',
+  type: 'menstrual-cycle-companion-history-row',
+  name: 'Menstrual Cycle Companion History (Table)',
   description: 'Menstrual cycle history in table format',
 });

@@ -52,7 +52,7 @@ function normalizeOptionKey(value) {
 class MenstruationGaugeCard extends HTMLElement {
   static getStubConfig() {
     return {
-      type: 'custom:menstrual-gauge-card',
+      type: 'custom:menstrual-cycle-companion-gauge',
       entity: 'sensor.menstruation',
       entry_id: '',
       friendly_name: '',
@@ -68,7 +68,7 @@ class MenstruationGaugeCard extends HTMLElement {
   }
 
   static getConfigElement() {
-    return document.createElement('menstrual-gauge-card-editor');
+    return document.createElement('menstrual-cycle-companion-gauge-editor');
   }
 
   setConfig(config) {
@@ -3124,28 +3124,15 @@ class MenstruationGaugeCardEditor extends HTMLElement {
     this._attachHandlers();
   }
 }
-if (!customElements.get('menstrual-gauge-card')) {
-  customElements.define('menstrual-gauge-card', MenstruationGaugeCard);
+if (!customElements.get('menstrual-cycle-companion-gauge')) {
+  customElements.define('menstrual-cycle-companion-gauge', MenstruationGaugeCard);
 }
-if (!customElements.get('menstrual-gauge-card-editor')) {
-  customElements.define('menstrual-gauge-card-editor', MenstruationGaugeCardEditor);
+if (!customElements.get('menstrual-cycle-companion-gauge-editor')) {
+  customElements.define('menstrual-cycle-companion-gauge-editor', MenstruationGaugeCardEditor);
 }
-if (!customElements.get('menstrual-cycle-gauge-card')) {
-  customElements.define('menstrual-cycle-gauge-card', MenstruationGaugeCard);
-}
-if (!customElements.get('menstrual-cycle-gauge-card-editor')) {
-  customElements.define('menstrual-cycle-gauge-card-editor', MenstruationGaugeCardEditor);
-}
-if (!customElements.get('menstruation-gauge-card')) {
-  customElements.define('menstruation-gauge-card', MenstruationGaugeCard);
-}
-if (!customElements.get('menstruation-gauge-card-editor')) {
-  customElements.define('menstruation-gauge-card-editor', MenstruationGaugeCardEditor);
-}
-
 window.customCards = window.customCards || [];
 window.customCards.push({
-  type: 'menstrual-gauge-card',
+  type: 'menstrual-cycle-companion-gauge',
   name: 'Menstruation Gauge Card',
   description: 'A card to visualize menstruation cycle, fertile window, ovulation, and related symptoms.',
 });

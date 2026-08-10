@@ -14,7 +14,7 @@ if (typeof _mcCompactStatusI18n.normalizeLang !== 'function') {
 class MenstruationCycleCompactStatusCard extends HTMLElement {
   static getStubConfig() {
     return {
-      type: 'custom:menstrual-cycle-compact-status',
+      type: 'custom:menstrual-cycle-companion-compact-status',
       entity: 'sensor.menstruation',
       entry_id: '',
       title: '',
@@ -868,17 +868,17 @@ class MenstruationCycleCompactStatusEditor extends HTMLElement {
   }
 }
 
-if (!customElements.get('menstrual-cycle-compact-status')) {
-  customElements.define('menstrual-cycle-compact-status', MenstruationCycleCompactStatusCard);
+if (!customElements.get('menstrual-cycle-companion-compact-status')) {
+  customElements.define('menstrual-cycle-companion-compact-status', MenstruationCycleCompactStatusCard);
 }
 
-if (!customElements.get('menstrual-cycle-compact-status-editor')) {
-  customElements.define('menstrual-cycle-compact-status-editor', MenstruationCycleCompactStatusEditor);
+if (!customElements.get('menstrual-cycle-companion-compact-status-editor')) {
+  customElements.define('menstrual-cycle-companion-compact-status-editor', MenstruationCycleCompactStatusEditor);
 }
 
 window.customCards = window.customCards || [];
 window.customCards.push({
-  type: 'menstrual-cycle-compact-status',
-  name: 'Menstruation Cycle Compact Status',
+  type: 'menstrual-cycle-companion-compact-status',
+  name: 'Menstrual Cycle Companion Compact Status',
   description: 'Compact cycle status with circular day indicator and status icon',
 });

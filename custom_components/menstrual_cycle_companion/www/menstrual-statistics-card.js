@@ -688,7 +688,7 @@ if (typeof _mcStatisticsCardI18n.normalizeLang !== 'function') {
 class MenstruationStatisticsCard extends HTMLElement {
   static getStubConfig() {
     return {
-      type: 'custom:menstrual-statistics-card',
+      type: 'custom:menstrual-cycle-companion-statistics',
       entity: '',
       title: '',
       days_back: 180,
@@ -698,7 +698,7 @@ class MenstruationStatisticsCard extends HTMLElement {
   }
 
   static getConfigElement() {
-    return document.createElement('menstrual-statistics-card-editor');
+    return document.createElement('menstrual-cycle-companion-statistics-editor');
   }
 
   setConfig(config) {
@@ -2499,13 +2499,13 @@ class MenstruationStatisticsCardEditor extends HTMLElement {
   }
 }
 
-customElements.define('menstrual-statistics-card-editor', MenstruationStatisticsCardEditor);
+customElements.define('menstrual-cycle-companion-statistics-editor', MenstruationStatisticsCardEditor);
 
-customElements.define('menstrual-statistics-card', MenstruationStatisticsCard);
+customElements.define('menstrual-cycle-companion-statistics', MenstruationStatisticsCard);
 
 window.customCards = window.customCards || [];
 window.customCards.push({
-  type: 'menstrual-statistics-card',
+  type: 'menstrual-cycle-companion-statistics',
   name: 'Menstruation Statistics Card',
   description: 'Displays menstrual cycle statistics and generates a doctor report.',
   preview: false,

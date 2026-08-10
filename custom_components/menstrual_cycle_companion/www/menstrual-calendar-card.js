@@ -59,12 +59,12 @@ class MenstruationCalendarCard extends HTMLElement {
   }
 
   static getConfigElement() {
-    return document.createElement('menstrual-calendar-card-editor');
+    return document.createElement('menstrual-cycle-companion-calendar-editor');
   }
 
   static getStubConfig() {
     return {
-      type: 'custom:menstrual-calendar-card',
+      type: 'custom:menstrual-cycle-companion-calendar',
       entity: 'sensor.menstruation',
       entry_id: '',
       title: 'Cycle Calendar',
@@ -1455,18 +1455,18 @@ class MenstruationCalendarCardEditor extends HTMLElement {
   }
 }
 
-if (!customElements.get('menstrual-calendar-card-editor')) {
-  customElements.define('menstrual-calendar-card-editor', MenstruationCalendarCardEditor);
+if (!customElements.get('menstrual-cycle-companion-calendar-editor')) {
+  customElements.define('menstrual-cycle-companion-calendar-editor', MenstruationCalendarCardEditor);
 }
 
 
-if (!customElements.get('menstrual-calendar-card')) {
-  customElements.define('menstrual-calendar-card', MenstruationCalendarCard);
+if (!customElements.get('menstrual-cycle-companion-calendar')) {
+  customElements.define('menstrual-cycle-companion-calendar', MenstruationCalendarCard);
 }
 
 window.customCards = window.customCards || [];
 window.customCards.push({
-  type: 'menstrual-calendar-card',
+  type: 'menstrual-cycle-companion-calendar',
   name: 'Menstruation Calendar Card',
   description: 'Standalone full-month calendar with period, fertile window, and ovulation markers.',
 });

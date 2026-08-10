@@ -51,17 +51,17 @@ class MenstruationCycleCard extends HTMLElement {
     // Parse cycle values
     const cycleLength = parseInt(String(attrs.avg_cycle_length || "28"), 10);
     const nextStart = attrs.next_predicted_start;
-    
+
     // Calculate cycleDay from nextStart date
     let cycleDay = 1;
-    
+
     if (nextStart) {
       try {
         const nextDate = new Date(nextStart);
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         nextDate.setHours(0, 0, 0, 0);
-        
+
         const daysUntil = Math.ceil((nextDate - today) / (1000 * 60 * 60 * 24));
         cycleDay = cycleLength - daysUntil;
       } catch (e) {
@@ -297,15 +297,15 @@ class MenstruationCycleCard extends HTMLElement {
   }
 
   static getConfigElement() {
-    return document.createElement("menstrual-cycle-card-editor");
+    return document.createElement("menstrual-cycle-companion-card-editor");
   }
 
   static getStubConfig() {
     return {
-      type: "custom:menstrual-cycle-card",
+      type: "custom:menstrual-cycle-companion-card",
       entity: "sensor.cycle_status",
     };
   }
 }
 
-customElements.define("menstrual-cycle-card", MenstruationCycleCard);
+customElements.define("menstrual-cycle-companion-card", MenstruationCycleCard);

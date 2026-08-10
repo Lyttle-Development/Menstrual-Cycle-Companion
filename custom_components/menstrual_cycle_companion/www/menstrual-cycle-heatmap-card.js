@@ -29,7 +29,7 @@ class MenstruationCycleHeatmapCard extends HTMLElement {
 
   static getStubConfig() {
     return {
-      type: 'custom:menstrual-cycle-heatmap-card',
+      type: 'custom:menstrual-cycle-companion-heatmap',
       entity: 'sensor.menstruation',
       entry_id: '',
       title: 'Zyklus Heatmap',
@@ -1292,16 +1292,16 @@ class MenstruationCycleHeatmapCardEditor extends HTMLElement {
   }
 }
 
-if (!customElements.get('menstrual-cycle-heatmap-card-editor')) {
-  customElements.define('menstrual-cycle-heatmap-card-editor', MenstruationCycleHeatmapCardEditor);
+if (!customElements.get('menstrual-cycle-companion-heatmap-editor')) {
+  customElements.define('menstrual-cycle-companion-heatmap-editor', MenstruationCycleHeatmapCardEditor);
 }
-if (!customElements.get('menstrual-cycle-heatmap-card')) {
-  customElements.define('menstrual-cycle-heatmap-card', MenstruationCycleHeatmapCard);
+if (!customElements.get('menstrual-cycle-companion-heatmap')) {
+  customElements.define('menstrual-cycle-companion-heatmap', MenstruationCycleHeatmapCard);
 }
 
 window.customCards = window.customCards || [];
 window.customCards.push({
-  type: 'menstrual-cycle-heatmap-card',
-  name: 'Menstruation Cycle Heatmap',
+  type: 'menstrual-cycle-companion-heatmap',
+  name: 'Menstrual Cycle Companion Heatmap',
   description: 'Heatmap mit einer Spalte pro Zyklus und einem Feld pro Zyklustag (grouped_starts kompatibel).',
 });

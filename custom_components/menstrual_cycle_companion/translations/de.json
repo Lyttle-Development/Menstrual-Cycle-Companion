@@ -27,42 +27,42 @@
     "add_cycle_start": {
       "name": "Zyklusstarttag hinzufügen",
       "description": "Füge einen bestätigten Blutungstag im Format JJJJ-MM-TT hinzu.",
-      "fields": {"entity_id": "Sensorentität", "profile": "Profil", "entry_id": "Konfigurationseintrags-ID", "date": "Datum"}
+      "fields": {"entity_id": {"name": "Sensorentität"}, "profile": {"name": "Profil"}, "entry_id": {"name": "Konfigurationseintrags-ID"}, "date": {"name": "Datum"}}
     },
     "remove_cycle_start": {
       "name": "Zyklusstarttag entfernen",
       "description": "Entferne einen bestätigten Blutungstag im Format JJJJ-MM-TT.",
-      "fields": {"entity_id": "Sensorentität", "profile": "Profil", "entry_id": "Konfigurationseintrags-ID", "date": "Datum"}
+      "fields": {"entity_id": {"name": "Sensorentität"}, "profile": {"name": "Profil"}, "entry_id": {"name": "Konfigurationseintrags-ID"}, "date": {"name": "Datum"}}
     },
     "set_cycle_range": {
       "name": "Zyklusstart- und -enddatum festlegen",
       "description": "Füge jeden bestätigten Blutungstag vom Startdatum bis einschließlich Enddatum hinzu.",
-      "fields": {"entity_id": "Sensorentität", "profile": "Profil", "entry_id": "Konfigurationseintrags-ID", "start_date": "Startdatum", "end_date": "Enddatum"}
+      "fields": {"entity_id": {"name": "Sensorentität"}, "profile": {"name": "Profil"}, "entry_id": {"name": "Konfigurationseintrags-ID"}, "start_date": {"name": "Startdatum"}, "end_date": {"name": "Enddatum"}}
     },
     "set_cycle_history": {
       "name": "Vollständige Zyklushistorie ersetzen",
       "description": "Ersetze die vollständige bestätigte Blutungshistorie durch eine Liste von Datumsangaben.",
-      "fields": {"entity_id": "Sensorentität", "profile": "Profil", "entry_id": "Konfigurationseintrags-ID", "dates": "Datumsangaben"}
+      "fields": {"entity_id": {"name": "Sensorentität"}, "profile": {"name": "Profil"}, "entry_id": {"name": "Konfigurationseintrags-ID"}, "dates": {"name": "Datumsangaben"}}
     },
     "set_period_duration": {
       "name": "Menstruationsdauer festlegen",
       "description": "Lege die prognostizierte Menstruationsdauer fest (für Markierungen in Karten).",
-      "fields": {"entity_id": "Sensorentität", "profile": "Profil", "entry_id": "Konfigurationseintrags-ID", "days": "Anzahl der Tage"}
+      "fields": {"entity_id": {"name": "Sensorentität"}, "profile": {"name": "Profil"}, "entry_id": {"name": "Konfigurationseintrags-ID"}, "days": {"name": "Anzahl der Tage"}}
     },
     "erase_all_history": {
       "name": "Gesamte Zyklushistorie löschen",
       "description": "Destruktive Aktion. Löscht die gesamte gespeicherte Historie.",
-      "fields": {"entity_id": "Sensorentität", "profile": "Profil", "entry_id": "Konfigurationseintrags-ID", "erase_all": "Löschen bestätigen"}
+      "fields": {"entity_id": {"name": "Sensorentität"}, "profile": {"name": "Profil"}, "entry_id": {"name": "Konfigurationseintrags-ID"}, "erase_all": {"name": "Löschen bestätigen"}}
     },
     "export_history": {
       "name": "Zyklushistorie exportieren",
       "description": "Exportiere die aktuelle Historie in eine lokale Datei.",
-      "fields": {"entity_id": "Sensorentität", "profile": "Profil", "entry_id": "Konfigurationseintrags-ID", "format": "Dateiformat", "filename": "Dateiname"}
+      "fields": {"entity_id": {"name": "Sensorentität"}, "profile": {"name": "Profil"}, "entry_id": {"name": "Konfigurationseintrags-ID"}, "format": {"name": "Dateiformat"}, "filename": {"name": "Dateiname"}}
     },
     "refresh_cycle_model": {
       "name": "Zyklusmodell aktualisieren",
       "description": "Berechne alle datumsbasierten Sensorwerte neu, einschließlich der Tage bis zum nächsten prognostizierten Start.",
-      "fields": {"entity_id": "Sensorentität", "profile": "Profil", "entry_id": "Konfigurationseintrags-ID"}
+      "fields": {"entity_id": {"name": "Sensorentität"}, "profile": {"name": "Profil"}, "entry_id": {"name": "Konfigurationseintrags-ID"}}
     }
   }
 }

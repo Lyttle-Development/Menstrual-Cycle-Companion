@@ -15,6 +15,14 @@
       "invalid_profile": "Le profil doit contenir des lettres ou des chiffres."
     }
   },
+  "entity": {
+    "sensor": {
+      "master": {
+        "name": "Cycle menstruel",
+        "state": {"period": "Règles", "fertile": "Fertile", "pms": "SPM", "neutral": "Neutre"}
+      }
+    }
+  },
   "services": {
     "add_cycle_start": {
       "name": "Ajouter le jour de début du cycle",

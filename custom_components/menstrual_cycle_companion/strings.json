@@ -15,6 +15,19 @@
       "invalid_profile": "Profile must contain letters or numbers."
     }
   },
+  "entity": {
+    "sensor": {
+      "master": {
+        "name": "Menstrual Cycle",
+        "state": {
+          "period": "Period",
+          "fertile": "Fertile",
+          "pms": "PMS",
+          "neutral": "Neutral"
+        }
+      }
+    }
+  },
   "services": {
     "add_cycle_start": {
       "name": "Add cycle start day",

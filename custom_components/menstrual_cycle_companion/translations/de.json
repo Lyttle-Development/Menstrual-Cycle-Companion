@@ -15,6 +15,14 @@
       "invalid_profile": "Das Profil muss Buchstaben oder Zahlen enthalten."
     }
   },
+  "entity": {
+    "sensor": {
+      "master": {
+        "name": "Menstruationszyklus",
+        "state": {"period": "Menstruation", "fertile": "Fruchtbar", "pms": "PMS", "neutral": "Neutral"}
+      }
+    }
+  },
   "services": {
     "add_cycle_start": {
       "name": "Zyklusstarttag hinzufügen",

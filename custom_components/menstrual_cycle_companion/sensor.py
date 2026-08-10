@@ -146,6 +146,7 @@ class MenstrualCycleGaugeSensor(SensorEntity):
     """Expose cycle state and computed attributes."""
 
     _attr_has_entity_name = False
+    _attr_translation_key = "master"
 
     def __init__(self, hass: HomeAssistant, entry: ConfigEntry) -> None:
         self.hass = hass

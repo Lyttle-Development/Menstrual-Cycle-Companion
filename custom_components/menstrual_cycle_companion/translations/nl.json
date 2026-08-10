@@ -15,6 +15,14 @@
       "invalid_profile": "Profiel moet letters of cijfers bevatten."
     }
   },
+  "entity": {
+    "sensor": {
+      "master": {
+        "name": "Menstruatiecyclus",
+        "state": {"period": "Menstruatie", "fertile": "Vruchtbaar", "pms": "PMS", "neutral": "Neutraal"}
+      }
+    }
+  },
   "services": {
     "add_cycle_start": {
       "name": "Startdag van cyclus toevoegen",

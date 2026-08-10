@@ -10,7 +10,6 @@ from dataclasses import dataclass, field
 from datetime import date, datetime
 from pathlib import Path
 from typing import Any
-from urllib.parse import parse_qs, urlsplit
 
 import voluptuous as vol
 
@@ -123,61 +122,16 @@ from .storage import MenstruationStorage
 
 PLATFORMS: list[Platform] = [Platform.SENSOR]
 MANIFEST_PATH = Path(__file__).with_name("manifest.json")
-WWW_DIR = Path(__file__).parent / "www"
 ASSETS_DIR = Path(__file__).parent / "assets"
+TRANSLATIONS_DIR = Path(__file__).parent / "www" / "translations"
 _ALLOWED_ASSET_SUBFOLDERS: frozenset[str] = frozenset({"pregnancy", "period", "state"})
 _HTTP_ROUTES_REGISTERED_KEY = f"{DOMAIN}_http_routes_registered"
-_LOVELACE_RESOURCES_ENSURED_KEY = f"{DOMAIN}_lovelace_resources_ensured"
-_LOVELACE_RESOURCES_SCHEDULED_KEY = f"{DOMAIN}_lovelace_resources_scheduled"
 
 # Domain used by the imported fork before this project’s namespace adaptation.
 OLD_DOMAIN = "menstruation_gauge"
 
 
-def _load_manifest_version() -> str:
-    """Read the integration version from manifest.json for cache busting."""
-    try:
-        with MANIFEST_PATH.open(encoding="utf-8") as manifest_file:
-            version = json.load(manifest_file).get("version")
-    except (OSError, TypeError, ValueError):
-        return "0.0.0"
-    return str(version or "0.0.0")
-
-
-def _build_card_static_url(filename: str) -> str:
-    """Build the HTTP handler path for a card JS file."""
-    return f"/{DOMAIN}/{filename}"
-
-
-def _build_card_resource_url(filename: str) -> str:
-    """Build the Lovelace resource URL with version-based cache busting."""
-    return f"{_build_card_static_url(filename)}?v={RESOURCE_VERSION}"
-
-
-RESOURCE_VERSION = _load_manifest_version()
-CARD_RESOURCE_TYPE = "module"
 EXPORT_DIR_NAME = "menstrual_cycle_companion_exports"
-CARD_FILES = [
-    "menstrual-i18n.js",
-    "menstrual-cycle-companion-gauge.js",
-    "menstrual-icons.js",
-    "menstrual-cycle-companion-heatmap.js",
-    "menstrual-cycle-companion-calendar.js",
-    "menstrual-cycle-companion-countdown.js",
-    "menstrual-cycle-companion-product-inventory.js",
-    "menstrual-cycle-companion-card.js",
-    "menstrual-cycle-companion-compact-status.js",
-    "menstrual-cycle-companion-history-row.js",
-    "menstrual-cycle-companion-statistics.js",
-]
-LOVELACE_RESOURCES = [
-    (
-        _build_card_resource_url(filename),
-        _build_card_static_url(filename),
-        filename,
-    )
-    for filename in CARD_FILES
-]
 VALID_PRODUCT_USAGE_PRODUCTS = {"tampon", "pad", "cup", "underwear", "liner"}
 VALID_PRODUCT_USAGE_ACTIONS = {"used", "emptied"}
 HOUSEHOLD_INVENTORY_STATE_ENTITY_ID = "sensor.household_product_stock"
@@ -1225,7 +1179,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         _register_domain_services(hass)
 
     await _async_register_http_handlers(hass)
-    _async_schedule_lovelace_resource_registration(hass)
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
@@ -1868,36 +1821,10 @@ async def _async_handle_update_menopause_date(hass: HomeAssistant, call: Service
     await _async_save_and_notify(hass, runtime)
 
 
-async def _maybe_await(result: Any) -> Any:
-    """Await coroutine-like values, return plain values unchanged."""
-    if inspect.isawaitable(result):
-        return await result
-    return result
-
-
 async def _async_register_http_handlers(hass: HomeAssistant) -> None:
-    """Register HTTP routes to serve card JS files from www/ directory."""
+    """Register shared asset and translation routes used by standalone cards."""
     if hass.data.get(_HTTP_ROUTES_REGISTERED_KEY):
         return
-
-    async def _serve_card_file(request):  # type: ignore[no-untyped-def]
-        from aiohttp.web import HTTPBadRequest, HTTPNotFound, Response
-
-        filename = request.match_info["filename"]
-        if "/" in filename or "\\" in filename or filename.startswith("."):
-            raise HTTPBadRequest()
-
-        file_path = WWW_DIR / filename
-        if not file_path.is_file():
-            _LOGGER.debug("Card file not found: %s", file_path)
-            raise HTTPNotFound()
-
-        content = await hass.async_add_executor_job(file_path.read_bytes)
-        return Response(
-            body=content,
-            content_type="application/javascript",
-            headers={"Cache-Control": "public, max-age=3600, s-maxage=3600"},
-        )
 
     async def _serve_asset_file(request):  # type: ignore[no-untyped-def]
         from aiohttp.web import HTTPBadRequest, HTTPNotFound, Response
@@ -1928,7 +1855,7 @@ async def _async_register_http_handlers(hass: HomeAssistant) -> None:
         if "/" in filename or "\\" in filename or filename.startswith(".") or not filename.endswith(".json"):
             raise HTTPBadRequest()
 
-        file_path = WWW_DIR / "translations" / filename
+        file_path = TRANSLATIONS_DIR / filename
         if not file_path.is_file():
             _LOGGER.debug("Translation file not found: %s", file_path)
             raise HTTPNotFound()
@@ -1946,304 +1873,8 @@ async def _async_register_http_handlers(hass: HomeAssistant) -> None:
     try:
         hass.http.app.router.add_get(f"/{DOMAIN}/translations/{{filename}}", _serve_translation_file)
         hass.http.app.router.add_get(f"/{DOMAIN}/assets/{{subfolder}}/{{filename}}", _serve_asset_file)
-        hass.http.app.router.add_get(f"/{DOMAIN}/{{filename}}", _serve_card_file)
         hass.data[_HTTP_ROUTES_REGISTERED_KEY] = True
-        for _resource_url, _static_url, filename in LOVELACE_RESOURCES:
-            _LOGGER.info("Registered HTTP route: /%s/%s", DOMAIN, filename)
         _LOGGER.info("Registered HTTP route: /%s/assets/{subfolder}/{filename}", DOMAIN)
         _LOGGER.info("Registered HTTP route: /%s/translations/{filename}", DOMAIN)
     except Exception as err:
-        _LOGGER.warning("Failed to register HTTP routes for card files: %s", err)
-
-
-def _async_schedule_lovelace_resource_registration(hass: HomeAssistant) -> None:
-    """Register Lovelace resources once the Lovelace component is ready."""
-    if hass.data.get(_LOVELACE_RESOURCES_SCHEDULED_KEY):
-        return
-
-    hass.data[_LOVELACE_RESOURCES_SCHEDULED_KEY] = True
-
-    async def _async_when_lovelace_ready(_hass: HomeAssistant, _component: str) -> None:
-        await _async_ensure_lovelace_resource(_hass)
-
-    try:
-        from homeassistant.setup import async_when_setup_or_start
-    except ImportError:
-        hass.async_create_task(_async_ensure_lovelace_resource(hass))
-        return
-
-    async_when_setup_or_start(hass, "lovelace", _async_when_lovelace_ready)
-
-
-def _normalize_resource_url(url: str | None) -> str | None:
-    """Normalize a resource URL for duplicate detection."""
-    if not url:
-        return None
-    return url.split("?", 1)[0]
-
-
-def _extract_resource_version(url: str | None) -> str | None:
-    """Extract the resource version value from a URL query string."""
-    if not url:
-        return None
-
-    try:
-        version_values = parse_qs(urlsplit(url).query).get("v")
-    except Exception:
-        return None
-
-    if not version_values:
-        return None
-    return version_values[-1]
-
-
-def _build_lovelace_resource_payloads(resource_url: str) -> list[dict[str, str]]:
-    """Build payloads for supported Lovelace resource schemas."""
-    payloads: list[dict[str, str]] = []
-    seen_type_keys: set[str] = set()
-
-    try:
-        from homeassistant.components.lovelace.const import CONF_RESOURCE_TYPE_WS
-
-        seen_type_keys.add(CONF_RESOURCE_TYPE_WS)
-        payloads.append({"url": resource_url, CONF_RESOURCE_TYPE_WS: CARD_RESOURCE_TYPE})
-    except Exception:
-        pass
-
-    for type_key in ("res_type", CONF_TYPE):
-        if type_key in seen_type_keys:
-            continue
-        seen_type_keys.add(type_key)
-        payloads.append({"url": resource_url, type_key: CARD_RESOURCE_TYPE})
-
-    return payloads
-
-
-async def _async_get_lovelace_resource_collection(hass: HomeAssistant) -> tuple[Any | None, str | None]:
-    """Return a Lovelace resource collection and its mode if available."""
-    try:
-        from homeassistant.components.lovelace.resources import async_get_resource_collection
-    except Exception:
-        async_get_resource_collection = None
-
-    if async_get_resource_collection is not None:
-        try:
-            collection = await _maybe_await(async_get_resource_collection(hass))
-        except Exception as err:
-            _LOGGER.debug("Legacy Lovelace resource helper failed: %s", err)
-        else:
-            if collection is not None:
-                return collection, None
-
-    try:
-        from homeassistant.components.lovelace.const import LOVELACE_DATA, MODE_STORAGE
-    except Exception as err:
-        _LOGGER.debug("Unable to import Lovelace constants: %s", err)
-        LOVELACE_DATA = None  # type: ignore[assignment]
-        MODE_STORAGE = "storage"  # type: ignore[assignment]
-
-    lovelace_data = hass.data.get(LOVELACE_DATA) if LOVELACE_DATA is not None else None
-    resource_mode = getattr(lovelace_data, "resource_mode", None)
-    collection = getattr(lovelace_data, "resources", None)
-    if collection is not None:
-        return collection, resource_mode
-
-    if resource_mode not in (None, MODE_STORAGE):
-        return None, resource_mode
-
-    if "lovelace" not in hass.config.components:
-        return None, resource_mode
-
-    try:
-        from homeassistant.components.lovelace.dashboard import LovelaceStorage
-        from homeassistant.components.lovelace.resources import ResourceStorageCollection
-
-        collection = ResourceStorageCollection(hass, LovelaceStorage(hass, None))
-        await collection.async_load()
-        return collection, MODE_STORAGE
-    except Exception as err:
-        _LOGGER.warning("Failed to create Lovelace resource storage collection: %s", err)
-        return None, resource_mode
-
-
-async def _async_ensure_lovelace_resource(hass: HomeAssistant) -> None:
-    """Auto-register Lovelace JS resources for storage dashboards."""
-    if hass.data.get(_LOVELACE_RESOURCES_ENSURED_KEY):
-        return
-    # Set guard early to prevent concurrent calls from all passing the initial check.
-    hass.data[_LOVELACE_RESOURCES_ENSURED_KEY] = True
-
-    collection, resource_mode = await _async_get_lovelace_resource_collection(hass)
-    if collection is None:
-        if "lovelace" not in hass.config.components:
-            _LOGGER.warning("Lovelace component is unavailable; cannot auto-register card resources")
-        elif resource_mode and resource_mode != "storage":
-            _LOGGER.warning(
-                "Lovelace resources use %s mode; automatic resource registration requires storage mode",
-                resource_mode,
-            )
-        else:
-            _LOGGER.warning("Lovelace resource collection is unavailable; card resources were not registered")
-        return
-
-    if not hasattr(collection, "async_create_item"):
-        _LOGGER.warning(
-            "Lovelace resource collection does not support automatic creation%s",
-            f" in {resource_mode} mode" if resource_mode else "",
-        )
-        return
-
-    try:
-        items = await _maybe_await(collection.async_items())
-        existing_urls = {
-            _normalize_resource_url(item.get("url"))
-            for item in items or []
-            if isinstance(item, dict) and item.get("url")
-        }
-        existing_exact_urls = {
-            str(item.get("url"))
-            for item in items or []
-            if isinstance(item, dict) and item.get("url")
-        }
-
-        added_count = 0
-        updated_count = 0
-        failed_urls: list[str] = []
-        for resource_url, _static_url, filename in LOVELACE_RESOURCES:
-            normalized_resource_url = _normalize_resource_url(resource_url)
-
-            if resource_url in existing_exact_urls:
-                _LOGGER.debug("Lovelace resource already registered: %s", resource_url)
-                continue
-
-            # A resource with the same base path but a DIFFERENT (older) version exists.
-            # Update it in place instead of skipping (which would leave the stale version
-            # active until cleanup deletes it, and re-adding a fresh copy would create a
-            # duplicate entry if the deletion and re-add ever land in different runs).
-            stale_item = None
-            if normalized_resource_url is not None:
-                for item in items or []:
-                    if not isinstance(item, dict) or not item.get("url"):
-                        continue
-                    if _normalize_resource_url(item.get("url")) == normalized_resource_url:
-                        stale_item = item
-                        break
-
-            if stale_item is not None and hasattr(collection, "async_update_item"):
-                try:
-                    item_id = stale_item.get("id")
-                    await _maybe_await(collection.async_update_item(item_id, {"url": resource_url}))
-                    updated_count += 1
-                    existing_urls.add(normalized_resource_url)
-                    existing_exact_urls.add(resource_url)
-                    _LOGGER.info("Updated Lovelace resource to new version: %s", resource_url)
-                    continue
-                except Exception as err:
-                    _LOGGER.debug("Failed to update stale Lovelace resource %s: %s", resource_url, err)
-                    # fall through to normal create/cleanup handling below
-
-            create_errors: list[str] = []
-            created = False
-            for payload in _build_lovelace_resource_payloads(resource_url):
-                try:
-                    await _maybe_await(collection.async_create_item(payload))
-                    added_count += 1
-                    if normalized_resource_url is not None:
-                        existing_urls.add(normalized_resource_url)
-                    existing_exact_urls.add(resource_url)
-                    _LOGGER.info("Registered Lovelace resource automatically: %s", resource_url)
-                    created = True
-                    break
-                except Exception as err:
-                    create_errors.append(f"{payload!r} -> {err}")
-
-                latest_items = await _maybe_await(collection.async_items())
-                existing_urls = {
-                    _normalize_resource_url(item.get("url"))
-                    for item in latest_items or []
-                    if isinstance(item, dict) and item.get("url")
-                }
-                existing_exact_urls = {
-                    str(item.get("url"))
-                    for item in latest_items or []
-                    if isinstance(item, dict) and item.get("url")
-                }
-                if resource_url in existing_exact_urls or (
-                    normalized_resource_url is not None and normalized_resource_url in existing_urls
-                ):
-                    _LOGGER.debug(
-                        "Lovelace resource detected after create error; skipping fallback payloads: %s",
-                        resource_url,
-                    )
-                    created = True
-                    break
-
-            if not created:
-                failed_urls.append(resource_url)
-                _LOGGER.error(
-                    "Failed to auto-register Lovelace resource %s (%s). Attempts: %s",
-                    resource_url,
-                    filename,
-                    " | ".join(create_errors),
-                )
-
-        if failed_urls:
-            _LOGGER.warning(
-                "Lovelace resource registration incomplete; %s resources still missing",
-                len(failed_urls),
-            )
-            return
-
-        await _async_cleanup_old_lovelace_resources(hass, RESOURCE_VERSION)
-        _LOGGER.info(
-            "Lovelace resource registration complete; %s new resources added, %s updated",
-            added_count,
-            updated_count,
-        )
-    except Exception as err:
-        _LOGGER.exception("Auto-registration of Lovelace resources failed: %s", err)
-
-
-async def _async_cleanup_old_lovelace_resources(hass: HomeAssistant, current_version: str) -> None:
-    """Remove outdated Lovelace resource entries from previous integration versions."""
-    collection, _resource_mode = await _async_get_lovelace_resource_collection(hass)
-    if collection is None or not hasattr(collection, "async_items") or not hasattr(collection, "async_delete_item"):
-        return
-
-    try:
-        items = await _maybe_await(collection.async_items())
-    except Exception as err:
-        _LOGGER.debug("Lovelace resource cleanup skipped: %s", err)
-        return
-
-    if not items:
-        return
-
-    current_base_urls = {_normalize_resource_url(resource_url) for resource_url, _static_url, _filename in LOVELACE_RESOURCES}
-    removed_count = 0
-
-    for item in items:
-        if not isinstance(item, dict) or not item.get("url"):
-            continue
-
-        item_url = str(item["url"])
-        if _normalize_resource_url(item_url) not in current_base_urls:
-            continue
-
-        item_version = _extract_resource_version(item_url)
-        if item_version is None or item_version == current_version:
-            continue
-
-        item_id = item.get("id")
-        try:
-            if item_id is None:
-                await _maybe_await(collection.async_delete_item(item))
-            else:
-                await _maybe_await(collection.async_delete_item(item_id))
-            removed_count += 1
-            _LOGGER.info("Removed outdated Lovelace resource: %s", item_url)
-        except Exception as err:
-            _LOGGER.debug("Could not remove outdated Lovelace resource %s: %s", item_url, err)
-
-    if removed_count:
-        _LOGGER.info("Lovelace resource cleanup complete; removed %s outdated resource entries", removed_count)
+        _LOGGER.warning("Failed to register shared asset routes: %s", err)

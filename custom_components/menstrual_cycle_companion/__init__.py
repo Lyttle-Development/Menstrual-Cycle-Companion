@@ -159,16 +159,16 @@ CARD_RESOURCE_TYPE = "module"
 EXPORT_DIR_NAME = "menstrual_cycle_companion_exports"
 CARD_FILES = [
     "menstrual-i18n.js",
-    "menstrual-gauge-card.js",
+    "menstrual-cycle-companion-gauge.js",
     "menstrual-icons.js",
-    "menstrual-cycle-heatmap-card.js",
-    "menstrual-calendar-card.js",
-    "menstrual-countdown-timer.js",
-    "menstrual-product-inventory-card.js",
-    "menstrual-cycle-card-compact.js",
-    "menstrual-cycle-compact-status-card.js",
-    "menstrual-cycle-history-card-row.js",
-    "menstrual-statistics-card.js",
+    "menstrual-cycle-companion-heatmap.js",
+    "menstrual-cycle-companion-calendar.js",
+    "menstrual-cycle-companion-countdown.js",
+    "menstrual-cycle-companion-product-inventory.js",
+    "menstrual-cycle-companion-card.js",
+    "menstrual-cycle-companion-compact-status.js",
+    "menstrual-cycle-companion-history-row.js",
+    "menstrual-cycle-companion-statistics.js",
 ]
 LOVELACE_RESOURCES = [
     (

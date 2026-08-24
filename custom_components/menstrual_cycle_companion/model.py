@@ -164,9 +164,9 @@ def predict_next_start(
 def predict_future_starts(
     next_start: str | None,
     cycle_length: int | None,
-    count: int = 12,
+    count: int = 120,
 ) -> list[str]:
-    """Return successive predicted cycle starts after the latest recorded cycle."""
+    """Return a long-range set of predicted cycle starts after the latest cycle."""
     if not next_start or not cycle_length or count <= 0:
         return []
 

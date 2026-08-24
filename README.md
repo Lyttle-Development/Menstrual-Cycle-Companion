@@ -72,13 +72,13 @@ data:
 
 ## Master sensor attributes and entities
 
-The `Current Phase` sensor state is one of `period`, `fertile`, `pms`, or `neutral`. The master sensor state remains the same for backwards compatibility. Every attribute below remains available on the master sensor:
+The `Current Phase` sensor state is one of `period`, `follicular`, `ovulation`, `luteal`, or `neutral`. The master sensor state remains the same for backwards compatibility. Every attribute below remains available on the master sensor:
 
 - `history`
 - `grouped_starts`
 - `bleeding_blocks`
 - `next_predicted_start`
-- `predicted_cycle_starts` — the next 12 predicted cycle starts
+- `predicted_cycle_starts` — a long-range set of predicted cycle starts
 - `avg_cycle_length`
 - `cycle_length_samples`
 - `cycle_length_variability_days`
@@ -109,7 +109,7 @@ model uses up to the eight most recent valid cycle intervals, gives newer
 cycles more weight, and filters isolated recording outliers. Period duration is
 learned from recent bleeding blocks once at least two blocks are available.
 The `predicted_cycle_starts` attribute projects the current predicted cycle
-length forward for 12 future starts and is recalculated when history changes.
+length forward for a long-range forecast and is recalculated when history changes.
 With no interval history, the model uses a clearly marked 28-day fallback;
 this is replaced automatically as more entries are recorded. The prediction
 metadata attributes expose the sample count, typical variation, method, and

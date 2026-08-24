@@ -74,7 +74,13 @@ def _remove_deprecated_sensor_entities(hass: HomeAssistant, entry: ConfigEntry) 
         "days_until_next_start",
         "menstruation_start",
         "menstruation_end",
+        "follicular_phase_start",
+        "follicular_phase_end",
+        "ovulation_start",
+        "ovulation_end",
         "ovulation_date",
+        "luteal_phase_start",
+        "luteal_phase_end",
         ATTR_CURRENT_PHASE,
     }
     for entity_entry in er.async_entries_for_config_entry(entity_registry, entry.entry_id):
@@ -501,5 +507,4 @@ async def _async_handle_export_history(hass: HomeAssistant, call: ServiceCall) -
 
 async def _async_handle_refresh_cycle_model(hass: HomeAssistant, call: ServiceCall) -> None:
     await _async_refresh_cycle_model(hass, _target_entry_ids_for_call(hass, call))
-
 

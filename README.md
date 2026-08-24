@@ -34,7 +34,7 @@ Copy `custom_components/menstrual_cycle_companion` into `/config/custom_componen
 
 ## First setup
 
-Create a profile with a stable profile name such as `anna` and a friendly name such as `Anna`. Home Assistant creates one device using that friendly name. The device contains a master sensor plus focused entities for `Current Phase`, `Next Predicted Start`, `Avg Cycle Length`, fertile-window dates, menstruation dates, ovulation date, and days until the next start; final entity IDs are controlled by Home Assistant's entity registry. The master sensor is the recommended entity for service calls and retains the complete attribute payload for existing cards.
+Create a profile with a stable profile name such as `anna` and a friendly name such as `Anna`. Home Assistant creates one device using that friendly name. The device contains a master sensor plus focused entities for `Current Phase`, prediction values, fertile-window dates, and start/end dates for menstruation, follicular, ovulation, and luteal phases; final entity IDs are controlled by Home Assistant's entity registry. The master sensor is the recommended entity for service calls and retains the complete attribute payload for existing cards.
 
 Add confirmed bleeding days from a card or with a service:
 
@@ -90,6 +90,7 @@ The `Current Phase` sensor state is one of `period`, `fertile`, `pms`, or `neutr
 - `menstruation_start` and `menstruation_end`
 - `follicular_phase_start` and `follicular_phase_end`
 - `ovulation_date`
+- `ovulation_start` and `ovulation_end` (the same date because ovulation is modelled as a one-day phase)
 - `luteal_phase_start` and `luteal_phase_end`
 - `current_phase`
 

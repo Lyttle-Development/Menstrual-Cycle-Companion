@@ -21,6 +21,7 @@ from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.util import slugify
 
 from .const import (
+    ATTR_CURRENT_PHASE,
     ATTR_HISTORY,
     ATTR_PERIOD_DURATION_DAYS,
     CONF_FRIENDLY_NAME,
@@ -57,8 +58,32 @@ from .storage import MenstrualCycleStorage
 PLATFORMS: list[Platform] = [Platform.SENSOR]
 EXPORT_DIR_NAME = "menstrual_cycle_companion_exports"
 MODEL_REFRESH_INTERVAL = timedelta(hours=2)
+ATTRIBUTE_UNIQUE_ID_PREFIX = "_attribute_"
 
 _LOGGER = logging.getLogger(__name__)
+
+
+def _remove_deprecated_sensor_entities(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Remove child entities that are no longer part of the public sensor set."""
+    entity_registry = er.async_get(hass)
+    allowed_keys = {
+        "next_predicted_start",
+        "avg_cycle_length",
+        "fertile_window_start",
+        "fertile_window_end",
+        "days_until_next_start",
+        "menstruation_start",
+        "menstruation_end",
+        "ovulation_date",
+        ATTR_CURRENT_PHASE,
+    }
+    for entity_entry in er.async_entries_for_config_entry(entity_registry, entry.entry_id):
+        unique_id = entity_entry.unique_id
+        if not unique_id.startswith(f"{entry.entry_id}{ATTRIBUTE_UNIQUE_ID_PREFIX}"):
+            continue
+        key = unique_id.removeprefix(f"{entry.entry_id}{ATTRIBUTE_UNIQUE_ID_PREFIX}")
+        if key not in allowed_keys:
+            entity_registry.async_remove(entity_entry.entity_id)
 
 
 @dataclass(slots=True)
@@ -228,6 +253,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     )
 
     hass.data[DOMAIN][entry.entry_id] = runtime
+    _remove_deprecated_sensor_entities(hass, entry)
 
     async def async_add(call: ServiceCall) -> None:
         await _async_handle_add(hass, call)
@@ -475,7 +501,5 @@ async def _async_handle_export_history(hass: HomeAssistant, call: ServiceCall) -
 
 async def _async_handle_refresh_cycle_model(hass: HomeAssistant, call: ServiceCall) -> None:
     await _async_refresh_cycle_model(hass, _target_entry_ids_for_call(hass, call))
-
-
 
 

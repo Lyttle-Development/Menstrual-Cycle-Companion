@@ -34,6 +34,7 @@ ATTR_FOLLICULAR_PHASE_END = "follicular_phase_end"
 ATTR_OVULATION_DATE = "ovulation_date"
 ATTR_LUTEAL_PHASE_START = "luteal_phase_start"
 ATTR_LUTEAL_PHASE_END = "luteal_phase_end"
+ATTR_CURRENT_PHASE = "current_phase"
 
 SERVICE_ADD_CYCLE_START = "add_cycle_start"
 SERVICE_REMOVE_CYCLE_START = "remove_cycle_start"

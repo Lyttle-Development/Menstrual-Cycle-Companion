@@ -18,6 +18,7 @@ from homeassistant.util import dt as dt_util
 from .const import (
     ATTR_AVG_CYCLE_LENGTH,
     ATTR_BLEEDING_BLOCKS,
+    ATTR_CURRENT_PHASE,
     ATTR_DAYS_UNTIL_NEXT_START,
     ATTR_FERTILE_WINDOW_END,
     ATTR_FERTILE_WINDOW_START,
@@ -53,33 +54,16 @@ async def async_setup_entry(
     )
 
 
-MODEL_ATTRIBUTE_KEYS = (
-    ATTR_HISTORY,
-    ATTR_GROUPED_STARTS,
-    ATTR_BLEEDING_BLOCKS,
+EXPOSED_ATTRIBUTE_KEYS = (
     ATTR_NEXT_PREDICTED_START,
-    ATTR_PREDICTED_CYCLE_STARTS,
     ATTR_AVG_CYCLE_LENGTH,
-    "cycle_length_samples",
-    "cycle_length_variability_days",
-    "prediction_confidence",
-    "prediction_method",
     ATTR_FERTILE_WINDOW_START,
     ATTR_FERTILE_WINDOW_END,
     ATTR_DAYS_UNTIL_NEXT_START,
-    ATTR_PERIOD_DURATION_DAYS,
-    "period_duration_default_days",
-    "period_duration_learned_avg_days",
     ATTR_MENSTRUATION_START,
     ATTR_MENSTRUATION_END,
-    ATTR_FOLLICULAR_PHASE_START,
-    ATTR_FOLLICULAR_PHASE_END,
     ATTR_OVULATION_DATE,
-    ATTR_LUTEAL_PHASE_START,
-    ATTR_LUTEAL_PHASE_END,
-    "profile",
-    "entry_id",
-    "friendly_name",
+    ATTR_CURRENT_PHASE,
 )
 
 DATE_ATTRIBUTE_KEYS = {
@@ -136,6 +120,7 @@ def _model_attributes(runtime: Any, entry: ConfigEntry, today: date) -> dict[str
         ATTR_OVULATION_DATE: model.ovulation_date if has_history else None,
         ATTR_LUTEAL_PHASE_START: model.luteal_phase_start if has_history else None,
         ATTR_LUTEAL_PHASE_END: model.luteal_phase_end if has_history else None,
+        ATTR_CURRENT_PHASE: model.state,
         "profile": runtime.profile,
         "entry_id": entry.entry_id,
         "friendly_name": runtime.friendly_name,
@@ -161,7 +146,7 @@ class MenstrualCycleGaugeSensor(SensorEntity):
     @property
     def attribute_keys(self) -> tuple[str, ...]:
         """Return the attributes represented by child entities."""
-        return MODEL_ATTRIBUTE_KEYS
+        return EXPOSED_ATTRIBUTE_KEYS
 
     async def async_added_to_hass(self) -> None:
         """Register update signals and daily refresh."""
@@ -323,4 +308,3 @@ class MenstrualCycleAttributeSensor(SensorEntity):
 
     def _handle_daily_refresh(self, _now: datetime) -> None:
         self.async_schedule_update_ha_state(True)
-

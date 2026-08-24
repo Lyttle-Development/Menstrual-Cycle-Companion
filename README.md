@@ -11,7 +11,8 @@ A privacy-first Home Assistant custom integration for recording menstrual bleedi
 - A focused set of useful values is exposed as entities for automations and
   visualisations.
 - Persistent local history in Home Assistant's `.storage` directory.
-- Current phase sensor state: `period`, `fertile`, `pms`, or `neutral`.
+- Current phase sensor state: `period`, `follicular`, `ovulation`, `luteal`, or
+  `neutral` when there is not enough history to determine a cycle.
 - Predicted next start, average cycle length, fertile-window dates, and days until the prediction.
 - Services for adding, removing, importing, exporting, and clearing history.
 - Inclusive cycle start/end date selection from the companion gauge card.

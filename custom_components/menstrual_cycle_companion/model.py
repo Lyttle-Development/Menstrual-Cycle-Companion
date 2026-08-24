@@ -6,7 +6,13 @@ from dataclasses import dataclass
 from datetime import date, timedelta
 from statistics import median
 
-from .const import STATE_FERTILE, STATE_NEUTRAL, STATE_PERIOD, STATE_PMS
+from .const import (
+    STATE_FOLLICULAR,
+    STATE_LUTEAL,
+    STATE_NEUTRAL,
+    STATE_OVULATION,
+    STATE_PERIOD,
+)
 
 
 @dataclass(slots=True)
@@ -93,7 +99,7 @@ def bleeding_blocks(days: list[str]) -> list[list[str]]:
 def learned_period_duration(default_days: int, blocks: list[list[str]]) -> tuple[int, int | None]:
     """Learn period duration from recent historical block lengths."""
     default_norm = max(1, min(14, int(default_days)))
-    if len(blocks) < 2:
+    if not blocks:
         return default_norm, None
 
     recent = blocks[-6:]
@@ -238,12 +244,15 @@ def build_cycle_model(history: list[str], period_duration_days: int, today: date
         days_until = (next_date - now).days
 
     state = STATE_NEUTRAL
-    if now.isoformat() in set(base_history):
+    today_iso = now.isoformat()
+    if menstruation_start and menstruation_end and menstruation_start <= today_iso <= menstruation_end:
         state = STATE_PERIOD
-    elif fertile_start and fertile_end and fertile_start <= now.isoformat() <= fertile_end:
-        state = STATE_FERTILE
-    elif next_start and abs((date.fromisoformat(next_start) - now).days) <= 1:
-        state = STATE_PMS
+    elif ovulation_date and today_iso == ovulation_date:
+        state = STATE_OVULATION
+    elif follicular_start and follicular_end and follicular_start <= today_iso <= follicular_end:
+        state = STATE_FOLLICULAR
+    elif luteal_start and luteal_end and luteal_start <= today_iso <= luteal_end:
+        state = STATE_LUTEAL
 
     return CycleModel(
         history=normalized,
